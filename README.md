@@ -2,6 +2,10 @@
 
 `otlh` is a command-line interface (CLI) tool for managing legal holds service. It allows users to perform various operations related to legal holds, such as creating, updating, and listing legal holds , as well as managing custodians.
 
+Key Features:
+- Single executable file with no dependencies on Runtime env (e.g., java) or external libraries (e.g., 3rd party dlls)
+- Cross platform support (Windows, Linux, and MacOS)
+
 ## Installation
 
 To install `otlh`, you can download the latest release from the [GitHub releases page](https://github.com/xifanyan/otlh/releases) or build it from source using Go.
@@ -33,7 +37,7 @@ USAGE:
    otlh [global options] command [command options] 
 
 VERSION:
-   0.1-alpha
+   0.1.0-beta
 
 COMMANDS:
    create   
