@@ -28,6 +28,7 @@ cd otlh/cmd/cli
 5. The `otlh` binary will be created in the bin/ directory.
 
 ## Usage
+### Top-level Commands
 ```
 bin/otlh.exe
 NAME:
@@ -56,8 +57,21 @@ GLOBAL OPTIONS:
    --version, -v                print the version
 ```
 
+#### Notes
+- domain name defaults to api.otlegalhold.com and port defaults to 443 (normally you do not have to specify them).
+- tenant is mandatory and can be specified in the config file or via environment variable LHN_TENANT.
+- authToken is mandatory and can be specified in the config file or via environment variable LHN_AUTHTOKEN.
+- config file is optional and can be specified via environment variable LHN_CONFIG, it uses the following format:
+```
+{
+    "domain": "api.otlegalhold.com",
+    "port": 443,
+    "tenant": "test",
+    "authToken": "*************************"
+}
+```
+
 ### Legalhold Import
-#### Usage
 ```
 ./otlh.exe import legalholds -h
 NAME:
@@ -85,12 +99,17 @@ OPTIONS:
 
 - Import all legalholds from excel file
 ```
-./otlh.exe -a [authToken] import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments
+./otlh.exe --tenant test --authToken [*****] import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments
+```
+
+- Debug mode
+```
+./otlh.exe --debug --tenant test --authToken [*****] import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments
 ```
 
 - Partially import legalholds from excel file based on matter or hold names
 ```
-./otlh.exe -a [authToken] import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments --matterName="Fargo vs Acme" --holdName="Fargo vs Acme Legal Hold"
+./otlh.exe --tenant test --authToken [*****] import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments --matterName="Fargo vs Acme" --holdName="Fargo vs Acme Legal Hold"
 ```
 
 #### Notes
