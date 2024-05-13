@@ -74,13 +74,20 @@ OPTIONS:
    --help, -h                               show help
 ```
 #### Examples
+- Validate input data in excel file only
 ```
-- Validate input data only
 ./otlh.exe import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments --checkInputOnly
+```
 
 - Import all legalholds from excel file
+```
 ./otlh.exe -a [authToken] import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments
+```
 
 - Partially import legalholds from excel file based on matter or hold names
+```
 ./otlh.exe -a [authToken] import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments --matterName="Fargo vs Acme" --holdName="Fargo vs Acme Legal Hold"
 ```
+
+#### Notes
+- all date fields in excel need to follow pattern "1/2/06 3:04 PM", by default, they will be considered to be UTC time.
