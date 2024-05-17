@@ -120,6 +120,40 @@ func (imptr *LegalholdExcelImporter) verifyLastIssued() error {
 	return nil
 }
 
+func (imptr *LegalholdExcelImporter) verifyResponseDate() error {
+	var verr *ValidationError = newValidationError(ErrorRequiredLastIssued)
+
+	for i, entry := range imptr.entries {
+		if entry.ResponseDate != "" {
+			if _, err := time.Parse(INPUT_TIME_FORMAT, entry.ResponseDate); err != nil {
+				verr.add(fmt.Errorf("line #%d: matter [%s] - hold [%s] - ResponseDate field is invalid: %s", imptr.lineNnumberOfHeader+i+1, entry.MatterName, entry.HoldName, err))
+			}
+		}
+	}
+
+	if verr.hasErrors() {
+		return verr
+	}
+	return nil
+}
+
+func (imptr *LegalholdExcelImporter) verifyReleasedAt() error {
+	var verr *ValidationError = newValidationError(ErrorRequiredLastIssued)
+
+	for i, entry := range imptr.entries {
+		if entry.ReleasedAt != "" {
+			if _, err := time.Parse(INPUT_TIME_FORMAT, entry.ReleasedAt); err != nil {
+				verr.add(fmt.Errorf("line #%d: matter [%s] - hold [%s] - ReleasedAt field is invalid: %s", imptr.lineNnumberOfHeader+i+1, entry.MatterName, entry.HoldName, err))
+			}
+		}
+	}
+
+	if verr.hasErrors() {
+		return verr
+	}
+	return nil
+}
+
 func (imptr *LegalholdExcelImporter) verifyEmailAddress() error {
 	var verr *ValidationError = newValidationError(ErrorInvalidEmailAddress)
 	for i, entry := range imptr.entries {
@@ -154,6 +188,16 @@ func (imptr *LegalholdExcelImporter) PerformDataIntegrityCheck() error {
 
 	log.Debug().Msg("Verify Last Issued field ...")
 	if err = imptr.verifyLastIssued(); err != nil {
+		return err
+	}
+
+	log.Debug().Msg("Verify Response Date field ...")
+	if err = imptr.verifyResponseDate(); err != nil {
+		return err
+	}
+
+	log.Debug().Msg("Verify Released At field ...")
+	if err = imptr.verifyReleasedAt(); err != nil {
 		return err
 	}
 
