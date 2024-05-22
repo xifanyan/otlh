@@ -37,6 +37,10 @@ type LegalholdDetail struct {
 type LegalholdDetails []LegalholdDetail
 
 func convertDateTimeFormat(tz string, input string) (string, error) {
+	if input == "" {
+		return "", fmt.Errorf("empty datetime")
+	}
+
 	if tz == "UTC" {
 		return input, nil
 	}
@@ -46,7 +50,7 @@ func convertDateTimeFormat(tz string, input string) (string, error) {
 		return "", err
 	}
 
-	inputTime, err := time.ParseInLocation(INPUT_TIME_FORMAT, tz, loc)
+	inputTime, err := time.ParseInLocation(INPUT_TIME_FORMAT, input, loc)
 	if err != nil {
 		return "", err
 	}
@@ -84,20 +88,18 @@ func (lhd LegalholdDetail) saveToExcel(dir string, tz string) error {
 			custodianDetail.Email,
 		}
 
-		sentAt, err := convertDateTimeFormat(tz, custodianDetail.SentAt)
-		if err == nil {
+		if sentAt, err := convertDateTimeFormat(tz, custodianDetail.SentAt); err == nil {
 			row = append(row, sentAt)
 		}
 
-		acknowlegedAt, err := convertDateTimeFormat(tz, custodianDetail.AcknowlegedAt)
-		if err == nil {
+		if acknowlegedAt, err := convertDateTimeFormat(tz, custodianDetail.AcknowlegedAt); err == nil {
 			row = append(row, acknowlegedAt)
 		}
 
-		releasedAt, err := convertDateTimeFormat(tz, custodianDetail.ReleasedAt)
-		if err == nil {
+		if releasedAt, err := convertDateTimeFormat(tz, custodianDetail.ReleasedAt); err == nil {
 			row = append(row, releasedAt)
 		}
+
 		f.SetSheetRow("custodian_details", fmt.Sprintf("A%d", i+2), &row)
 	}
 

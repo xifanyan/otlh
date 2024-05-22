@@ -284,14 +284,14 @@ func (imptr *LegalholdExcelImporter) Import() error {
 		)
 
 		if matterID, err = imptr.GetMatterID(legalholdDetail.HoldDetail.MatterName); err != nil {
-			log.Error().Msgf("%s %s not able to get matter id", legalholdDetail.HoldDetail.MatterName, legalholdDetail.HoldDetail.HoldName)
+			log.Error().Msgf("[%s - %s] not able to get matter id", legalholdDetail.HoldDetail.MatterName, legalholdDetail.HoldDetail.HoldName)
 			continue
 		}
 		legalholdDetail.HoldDetail.MatterID = fmt.Sprintf("%d", matterID)
 
 		_, err := imptr.client.FindLegalhold(legalholdDetail.HoldDetail.HoldName, matterID)
 		if err == nil {
-			log.Error().Msgf("%s %s already exists", legalholdDetail.HoldDetail.MatterName, legalholdDetail.HoldDetail.HoldName)
+			log.Error().Msgf("[%s - %s] already exists", legalholdDetail.HoldDetail.MatterName, legalholdDetail.HoldDetail.HoldName)
 			continue
 		}
 
@@ -314,14 +314,16 @@ func (imptr *LegalholdExcelImporter) Import() error {
 			}
 		}
 
+		log.Debug().Msgf("Creating Zip file: %s", tmpDir+"/legal_hold_details.zip")
 		if err = otlh.CreateZipArchive(tmpDir+"/legal_hold_details.zip", files); err != nil {
 			log.Error().Msgf("not able to create zip file [%s - %s]: %s", legalholdDetail.HoldDetail.MatterName, legalholdDetail.HoldDetail.HoldName, err)
 			continue
 		}
 
+		log.Debug().Msgf("Importing legalhold - [%s - %s]", legalholdDetail.HoldDetail.MatterName, legalholdDetail.HoldDetail.HoldName)
 		_, err = imptr.client.ImportLegalhold(tmpDir + "/legal_hold_details.zip")
 		if err != nil {
-			log.Error().Msgf("legalhold import failed %s [%s - %s]", err, legalholdDetail.HoldDetail.MatterName, legalholdDetail.HoldDetail.HoldName)
+			log.Error().Msgf("legalhold import failed %s - [%s - %s]", err, legalholdDetail.HoldDetail.MatterName, legalholdDetail.HoldDetail.HoldName)
 			continue
 		}
 

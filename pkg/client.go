@@ -432,7 +432,7 @@ func (c *Client) FindFolderByName(name string) (Folder, error) {
 	var err error
 	var folders Folders = Folders{}
 
-	log.Debug().Msgf("finding folder by name %s", name)
+	log.Debug().Msgf("searching folder by name [%s]", name)
 
 	/*
 		filterName helps to limit the results to folders CONTAINING the provided name.
@@ -450,7 +450,7 @@ func (c *Client) FindFolderByName(name string) (Folder, error) {
 		}
 	}
 
-	return Folder{}, fmt.Errorf("folder %s not found", name)
+	return Folder{}, fmt.Errorf("folder [%s] not found", name)
 }
 
 /**
@@ -502,11 +502,11 @@ func (c *Client) CreateFolder(name string) (Folder, error) {
  */
 func (c *Client) FindOrCreateFolder(name string) (Folder, error) {
 	if folder, err := c.FindFolderByName(name); err == nil {
-		log.Debug().Msgf("found folder %s with id %d", name, folder.ID)
+		log.Debug().Msgf("found folder [%s] with id [%d]", name, folder.ID)
 		return folder, nil
 	}
 
-	log.Debug().Msgf("folder %s not found, creating", name)
+	log.Debug().Msgf("folder [%s] not found, creating", name)
 
 	return c.CreateFolder(name)
 }
@@ -521,6 +521,8 @@ func (c *Client) FindOrCreateFolder(name string) (Folder, error) {
 func (c *Client) FindMatterByName(name string) (Matter, error) {
 	var err error
 	var matters Matters = Matters{}
+
+	log.Debug().Msgf("searching matter by name [%s]", name)
 
 	/*
 		filterName helps to limit the results to folders CONTAINING the provided name.
@@ -537,7 +539,7 @@ func (c *Client) FindMatterByName(name string) (Matter, error) {
 		}
 	}
 
-	return Matter{}, fmt.Errorf("matter %s not found", name)
+	return Matter{}, fmt.Errorf("matter [%s] not found", name)
 }
 
 /**
@@ -582,11 +584,11 @@ func (c *Client) CreateMatter(name string, folderID int) (Matter, error) {
  */
 func (c *Client) FindOrCreateMatter(name string, folderID int) (Matter, error) {
 	if matter, err := c.FindMatterByName(name); err == nil {
-		log.Debug().Msgf("found matter %s with id %d", name, matter.ID)
+		log.Debug().Msgf("found matter [%s] with id [%d]", name, matter.ID)
 		return matter, nil
 	}
 
-	log.Debug().Msgf("matter %s not found, creating", name)
+	log.Debug().Msgf("matter [%s] not found, creating", name)
 
 	return c.CreateMatter(name, folderID)
 }
@@ -601,6 +603,8 @@ func (c *Client) FindOrCreateMatter(name string, folderID int) (Matter, error) {
 func (c *Client) FindLegalhold(name string, matterID int) (Legalhold, error) {
 	var err error
 	var legalholds Legalholds = Legalholds{}
+
+	log.Debug().Msgf("searching legalhold by name [%s] and matterID [%d]", name, matterID)
 
 	/*
 		filterName helps to limit the results to folders CONTAINING the provided name.
@@ -617,5 +621,5 @@ func (c *Client) FindLegalhold(name string, matterID int) (Legalhold, error) {
 		}
 	}
 
-	return Legalhold{}, fmt.Errorf("legalhold %s not found", name)
+	return Legalhold{}, fmt.Errorf("legalhold [%s] not found", name)
 }
