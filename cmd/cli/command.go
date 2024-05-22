@@ -51,6 +51,7 @@ var (
 		Flags: []cli.Flag{
 			AtttachmentDirectory,
 			Excel,
+			Timezone,
 			HoldName,
 			MatterName,
 			CheckInputOnly,
@@ -184,9 +185,13 @@ func NewClient(ctx *cli.Context) *otlh.Client {
 func importLegalholds(ctx *cli.Context) error {
 	var err error
 
+	tz := otlh.GetTimezoneLocation(ctx.String("timezone"))
+	log.Debug().Msgf("timezone: %s", tz)
+
 	imp := importer.NewLegalholdExcelImporter().
 		WithClient(NewClient(ctx)).
 		WithExcel(ctx.String("excel")).
+		WithTimezone(tz).
 		WithMatterName(ctx.String("matterName")).
 		WithHoldName(ctx.String("holdName")).
 		WithAttachmentDirectory(ctx.String("attachmentDirectory"))

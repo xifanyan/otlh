@@ -51,6 +51,7 @@ type LegalholdExcelImporter struct {
 	lineNnumberOfHeader int
 	collections         Collections
 	client              *otlh.Client
+	timezone            string
 }
 
 func NewLegalholdExcelImporter() *LegalholdExcelImporter {
@@ -75,6 +76,11 @@ func (imptr *LegalholdExcelImporter) WithClient(client *otlh.Client) *LegalholdE
 
 func (imptr *LegalholdExcelImporter) WithExcel(excel string) *LegalholdExcelImporter {
 	imptr.excel = excel
+	return imptr
+}
+
+func (imptr *LegalholdExcelImporter) WithTimezone(tz string) *LegalholdExcelImporter {
+	imptr.timezone = tz
 	return imptr
 }
 
@@ -295,7 +301,7 @@ func (imptr *LegalholdExcelImporter) Import() error {
 		}
 		log.Debug().Msgf("temp dir: %s", tmpDir)
 
-		if err = legalholdDetail.saveToExcel(tmpDir); err != nil {
+		if err = legalholdDetail.saveToExcel(tmpDir, imptr.timezone); err != nil {
 			log.Error().Msgf("not able to save to excel file [%s - %s]", legalholdDetail.HoldDetail.MatterName, legalholdDetail.HoldDetail.HoldName)
 			continue
 		}

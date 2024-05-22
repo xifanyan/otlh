@@ -86,6 +86,7 @@ CATEGORY:
 OPTIONS:
    --attachmentDirectory value, --ad value  attachment directory (default: ".")
    --excel value, -e value                  excel file used for legalhold import
+   --timezone value, --tz value             timezone for dates used in input file e.g., PST or EST (default: "UTC")
    --holdName value, --hn value             hold name
    --matterName value, --mn value           matter name
    --checkInputOnly, --ci                   check input only (default: false)
@@ -97,9 +98,9 @@ OPTIONS:
 ./otlh.exe import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments --checkInputOnly
 ```
 
-- Import all legalholds from excel file
+- Import all legalholds from excel file, all dates in the file are in PST
 ```
-./otlh.exe --tenant test --authToken [*****] import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments
+./otlh.exe --tenant test --authToken [*****] import legalholds --timezone=PST --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments
 ```
 
 - Debug mode

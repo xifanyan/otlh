@@ -36,19 +36,28 @@ type LegalholdDetail struct {
 
 type LegalholdDetails []LegalholdDetail
 
-func convertDateTimeFormat(input string) (string, error) {
+func convertDateTimeFormat(tz string, input string) (string, error) {
+	if tz == "UTC" {
+		return input, nil
+	}
 
-	t, err := time.Parse(INPUT_TIME_FORMAT, input)
+	loc, err := time.LoadLocation(tz)
 	if err != nil {
 		return "", err
 	}
 
-	output := t.Format(OUTPUT_TIME_FORMAT)
+	inputTime, err := time.ParseInLocation(INPUT_TIME_FORMAT, tz, loc)
+	if err != nil {
+		return "", err
+	}
+
+	outputTime := inputTime.In(time.UTC)
+	output := outputTime.Format(OUTPUT_TIME_FORMAT)
 
 	return output, nil
 }
 
-func (lhd LegalholdDetail) saveToExcel(dir string) error {
+func (lhd LegalholdDetail) saveToExcel(dir string, tz string) error {
 	var err error
 
 	f := excelize.NewFile()
@@ -75,17 +84,17 @@ func (lhd LegalholdDetail) saveToExcel(dir string) error {
 			custodianDetail.Email,
 		}
 
-		sentAt, err := convertDateTimeFormat(custodianDetail.SentAt)
+		sentAt, err := convertDateTimeFormat(tz, custodianDetail.SentAt)
 		if err == nil {
 			row = append(row, sentAt)
 		}
 
-		acknowlegedAt, err := convertDateTimeFormat(custodianDetail.AcknowlegedAt)
+		acknowlegedAt, err := convertDateTimeFormat(tz, custodianDetail.AcknowlegedAt)
 		if err == nil {
 			row = append(row, acknowlegedAt)
 		}
 
-		releasedAt, err := convertDateTimeFormat(custodianDetail.ReleasedAt)
+		releasedAt, err := convertDateTimeFormat(tz, custodianDetail.ReleasedAt)
 		if err == nil {
 			row = append(row, releasedAt)
 		}

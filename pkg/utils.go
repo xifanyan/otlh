@@ -112,3 +112,17 @@ func IsValidEmailAddress(email string) bool {
 	_, err := mail.ParseAddress(email)
 	return err == nil
 }
+
+func GetTimezoneLocation(tz string) string {
+	switch tz {
+	case "PST":
+		return "America/Los_Angeles"
+	case "EST":
+		return "America/New_York"
+	case "MST":
+		return "America/Denver"
+	// Add more cases for other timezones if needed
+	default:
+		return "UTC"
+	}
+}

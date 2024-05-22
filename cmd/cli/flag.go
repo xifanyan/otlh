@@ -79,6 +79,13 @@ var (
 		Usage:   "attachment directory",
 		Value:   ".",
 	}
+
+	Timezone = &cli.StringFlag{
+		Name:    "timezone",
+		Aliases: []string{"tz"},
+		Usage:   "timezone for dates used in input file e.g., PST or EST",
+		Value:   "UTC",
+	}
 )
 
 var DefaultListOptions = []cli.Flag{
