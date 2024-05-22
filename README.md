@@ -37,7 +37,7 @@ USAGE:
    otlh [global options] command [command options] 
 
 VERSION:
-   0.1.0-beta
+   0.3.1-beta
 
 COMMANDS:
    create   
@@ -98,7 +98,7 @@ OPTIONS:
 ./otlh.exe import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments --checkInputOnly
 ```
 
-- Import all legalholds from excel file, all dates in the file are in PST
+- Import all legalholds from excel file, also convert datetime fields in PST to UTC.
 ```
 ./otlh.exe --tenant test --authToken [*****] import legalholds --timezone=PST --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments
 ```
@@ -114,5 +114,5 @@ OPTIONS:
 ```
 
 #### Notes
-- all date fields in excel need to follow pattern "1/2/06 3:04 PM", by default, they will be considered to be UTC time.
+- all datetime fields in excel need to follow pattern "1/2/06 3:04 PM", UTC is the default timezone, if you want to change it, please use --timezone option.
 - Attachment files should be put under attachment directory, it currently does not support subfolders, so please make attachment file names unique.
