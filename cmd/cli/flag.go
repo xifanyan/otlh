@@ -14,6 +14,11 @@ var (
 		Usage: "name",
 	}
 
+	All = &cli.BoolFlag{
+		Name:  "all",
+		Usage: "all",
+	}
+
 	ID = &cli.IntFlag{
 		Name:  "id",
 		Usage: "id",
@@ -89,6 +94,7 @@ var (
 )
 
 var DefaultListOptions = []cli.Flag{
+	All,
 	ID,
 	PageNumber,
 	PageSize,

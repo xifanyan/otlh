@@ -6,6 +6,7 @@ import (
 
 	otlh "github.com/xifanyan/otlh/pkg"
 	importer "github.com/xifanyan/otlh/pkg/importer"
+	"github.com/xifanyan/otlh/pkg/verifier"
 
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
@@ -56,6 +57,20 @@ var (
 			MatterName,
 			CheckInputOnly,
 		},
+	}
+
+	VerifyCmd = &cli.Command{
+		Name: "verify",
+		Subcommands: []*cli.Command{
+			VerifyCustodiansCmd,
+		},
+	}
+
+	VerifyCustodiansCmd = &cli.Command{
+		Name:     "custodians",
+		Category: "verify",
+		Action:   execute,
+		Flags:    []cli.Flag{},
 	}
 
 	GetCustodiansCmd = &cli.Command{
@@ -109,6 +124,7 @@ var (
 		CreateCmd,
 		GetCmd,
 		ImportCmd,
+		VerifyCmd,
 	}
 )
 
@@ -150,6 +166,11 @@ func execute(ctx *cli.Context) error {
 			return getMatters(ctx)
 		case "legalholds":
 			return getLegalholds(ctx)
+		}
+	case "verify":
+		switch ctx.Command.Name {
+		case "custodians":
+			return verifyCustodians(ctx)
 		}
 	}
 	return nil
@@ -228,6 +249,11 @@ func getCustodians(ctx *cli.Context) error {
 	var v any
 
 	client := NewClient(ctx)
+
+	if ctx.Bool("all") {
+		client.PrintAllCustodians()
+		return nil
+	}
 
 	if ctx.Int("id") > 0 {
 		v, err = client.GetCustodian(ctx.Int("id"))
@@ -323,4 +349,18 @@ func createMatter(ctx *cli.Context) error {
 	_, err = client.FindOrCreateMatter(ctx.String("name"), ctx.Int("folderID"))
 
 	return err
+}
+
+func verifyCustodians(ctx *cli.Context) error {
+	var err error
+
+	vf := verifier.NewCustodianVerifier().
+		WithClient(NewClient(ctx))
+
+	err = vf.LoadAllCustodiansFromOTLH()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

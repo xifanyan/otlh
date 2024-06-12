@@ -60,7 +60,7 @@ func main() {
 		},
 		Commands: Commands,
 		Before: func(c *cli.Context) error {
-			zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+			zerolog.SetGlobalLevel(zerolog.InfoLevel)
 			if c.Bool("debug") {
 				zerolog.SetGlobalLevel(zerolog.DebugLevel)
 			}

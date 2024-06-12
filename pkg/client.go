@@ -333,12 +333,14 @@ func (c *Client) GetLegalholds(opts Options) (Legalholds, error) {
  * - custodiansChan: a channel that will receive all custodians
  * - errsChan: a channel that will receive any errors that occur
  */
-func (c *Client) GetAllCustodians(req Requestor, opts Options) (<-chan Custodian, <-chan error) {
+func (c *Client) GetAllCustodians(opts Options) (<-chan Custodian, <-chan error) {
 
 	var resp CustodiansResponse
 
 	custodiansChan := make(chan Custodian)
 	errsChan := make(chan error)
+
+	req, _ := NewRequest().WithTenant(c.tenant).Get().Custodian().Build()
 
 	go func() {
 		var v []byte
@@ -349,6 +351,7 @@ func (c *Client) GetAllCustodians(req Requestor, opts Options) (<-chan Custodian
 
 		page := 1
 		for {
+			log.Debug().Msgf("GetAllCustodians: page %d", page)
 			opts.(*ListOptions).WithPageNumber(page)
 			if v, err = c.Send(req, opts); err != nil {
 				errsChan <- err
@@ -372,6 +375,35 @@ func (c *Client) GetAllCustodians(req Requestor, opts Options) (<-chan Custodian
 	}()
 
 	return custodiansChan, errsChan
+}
+
+func (c *Client) PrintAllCustodians() {
+
+	printer := NewPrinter().JSON().Build()
+
+	opts := NewListOptions().WithPageSize(100)
+
+	custodianCh, errCh := c.GetAllCustodians(opts)
+	for {
+		select {
+		case custodian, ok := <-custodianCh:
+			if !ok {
+				custodianCh = nil
+			} else {
+				printer.Print(custodian)
+			}
+		case err, ok := <-errCh:
+			if !ok {
+				errCh = nil
+			} else {
+				log.Error().Err(err)
+			}
+		}
+
+		if custodianCh == nil && errCh == nil {
+			break
+		}
+	}
 }
 
 /**
