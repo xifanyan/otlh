@@ -70,7 +70,9 @@ var (
 		Name:     "custodians",
 		Category: "verify",
 		Action:   execute,
-		Flags:    []cli.Flag{},
+		Flags: []cli.Flag{
+			CSV,
+		},
 	}
 
 	GetCustodiansCmd = &cli.Command{
@@ -357,9 +359,22 @@ func verifyCustodians(ctx *cli.Context) error {
 	vf := verifier.NewCustodianVerifier().
 		WithClient(NewClient(ctx))
 
-	err = vf.LoadAllCustodiansFromOTLH()
+	custodiansFromOTLH, err := vf.LoadAllCustodiansFromOTLH()
 	if err != nil {
 		return err
+	}
+
+	custodiansFromCSV, err := vf.LoadCustodiansFromCSV(ctx.String("csv"))
+	if err != nil {
+		return err
+	}
+
+	for custodian, _ := range custodiansFromCSV {
+		if _, ok := custodiansFromOTLH[custodian]; ok {
+			continue
+		} else {
+			log.Error().Msgf("Custodian %s not found in OTLH", custodian)
+		}
 	}
 
 	return nil
