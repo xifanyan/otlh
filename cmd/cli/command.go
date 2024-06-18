@@ -359,23 +359,28 @@ func verifyCustodians(ctx *cli.Context) error {
 	vf := verifier.NewCustodianVerifier().
 		WithClient(NewClient(ctx))
 
-	custodiansFromOTLH, err := vf.LoadAllCustodiansFromOTLH()
+		/*
+			custodiansFromOTLH, err := vf.LoadAllCustodiansFromOTLH()
+			if err != nil {
+				return err
+			}
+		*/
+
+	// custodiansFromCSV, err := vf.LoadCustodiansFromCSV(ctx.String("csv"))
+	_, err = vf.LoadCustodiansFromCSV(ctx.String("csv"))
 	if err != nil {
 		return err
 	}
 
-	custodiansFromCSV, err := vf.LoadCustodiansFromCSV(ctx.String("csv"))
-	if err != nil {
-		return err
-	}
-
-	for custodian, _ := range custodiansFromCSV {
-		if _, ok := custodiansFromOTLH[custodian]; ok {
-			continue
-		} else {
-			log.Error().Msgf("Custodian %s not found in OTLH", custodian)
+	/*
+		for custodian := range custodiansFromCSV {
+			if _, ok := custodiansFromOTLH[custodian]; ok {
+				continue
+			} else {
+				log.Error().Msgf("Custodian %s not found in OTLH", custodian)
+			}
 		}
-	}
+	*/
 
 	return nil
 }

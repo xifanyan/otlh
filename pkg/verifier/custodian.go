@@ -88,6 +88,10 @@ func (cv *CustodianVerifier) LoadCustodiansFromCSV(fileName string) (map[string]
 
 	// Iterate over the slice and use the Name field as the key
 	for _, custodian := range custodians {
+		if _, ok := dataMap[custodian.Emailaddress]; ok {
+			log.Error().Msgf("Duplicate custodian: %s", custodian.Emailaddress)
+			continue
+		}
 		dataMap[custodian.Emailaddress] = struct{}{}
 	}
 

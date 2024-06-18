@@ -384,12 +384,22 @@ func (c *Client) PrintAllCustodians() {
 	opts := NewListOptions().WithPageSize(100)
 
 	custodianCh, errCh := c.GetAllCustodians(opts)
+
+	fmt.Println("[")
+
+	isFirstElement := true
 	for {
 		select {
 		case custodian, ok := <-custodianCh:
+
 			if !ok {
 				custodianCh = nil
 			} else {
+				if !isFirstElement {
+					fmt.Println(",")
+				}
+				isFirstElement = false
+
 				printer.Print(custodian)
 			}
 		case err, ok := <-errCh:
@@ -404,6 +414,8 @@ func (c *Client) PrintAllCustodians() {
 			break
 		}
 	}
+
+	fmt.Println("]")
 }
 
 /**
