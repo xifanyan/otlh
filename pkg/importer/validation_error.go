@@ -11,6 +11,8 @@ var (
 	ErrorRequiredLastIssued                            = errors.New("last issued field is required")
 	ErrorAttachmentFileNotFound                        = errors.New("attachment file not found")
 	ErrorInvalidEmailAddress                           = errors.New("invalid email address")
+	ErrorHoldNameTooLong                               = errors.New("hold name too long")
+	ErrorCustodianNotFound                             = errors.New("custodian not found")
 )
 
 type ValidationError struct {

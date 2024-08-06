@@ -7,6 +7,8 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
+const MAX_LENGTH_OF_HOLDNAME int = 100
+
 var HoldDetailsHeader = []string{"Matter id", "Hold Name", "Hold notice subject", "Hold notice body", "Hold notice title", "Hold notice attachment names"}
 var CustodianDetailsHeader = []string{"Name", "Email", "sent_at", "acknowledged_at", "released_at"}
 

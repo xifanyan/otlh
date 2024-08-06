@@ -159,6 +159,8 @@ func (c *Client) Send(req Requestor, opts ...Options) ([]byte, error) {
 		r.SetHeader("Content-Type", "multipart/form-data")
 	}
 
+	// log.Debug().Msgf("endpoint: %s", req.Endpoint())
+
 	switch req.Method() {
 	case GET:
 		resp, err = r.Get(req.Endpoint())

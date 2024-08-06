@@ -112,6 +112,9 @@ func (imptr *LegalholdExcelImporter) verifyLastIssued() error {
 		if _, err := time.Parse(INPUT_TIME_FORMAT, entry.LastIssued); err != nil {
 			verr.add(fmt.Errorf("line #%d: matter [%s] - hold [%s] - LastIssued field is invalid: %s", imptr.lineNnumberOfHeader+i+1, entry.MatterName, entry.HoldName, err))
 		}
+
+		d, _ := convertDateTimeFormat(imptr.timezone, entry.LastIssued)
+		log.Debug().Msgf("- line #%d: [%s] %s -> [UTC] %s", imptr.lineNnumberOfHeader+i+1, imptr.timezone, entry.LastIssued, d)
 	}
 
 	if verr.hasErrors() {
@@ -128,6 +131,8 @@ func (imptr *LegalholdExcelImporter) verifyResponseDate() error {
 			if _, err := time.Parse(INPUT_TIME_FORMAT, entry.ResponseDate); err != nil {
 				verr.add(fmt.Errorf("line #%d: matter [%s] - hold [%s] - ResponseDate field is invalid: %s", imptr.lineNnumberOfHeader+i+1, entry.MatterName, entry.HoldName, err))
 			}
+			d, _ := convertDateTimeFormat(imptr.timezone, entry.ResponseDate)
+			log.Debug().Msgf("- line #%d: [%s] %s -> [UTC] %s", imptr.lineNnumberOfHeader+i+1, imptr.timezone, entry.ResponseDate, d)
 		}
 	}
 
@@ -168,6 +173,56 @@ func (imptr *LegalholdExcelImporter) verifyEmailAddress() error {
 	return nil
 }
 
+func (imptr *LegalholdExcelImporter) verifyHoldName() error {
+	var verr *ValidationError = newValidationError(ErrorHoldNameTooLong)
+	for i, entry := range imptr.entries {
+		if len(entry.HoldName) > MAX_LENGTH_OF_HOLDNAME {
+			verr.add(fmt.Errorf("line #%d: matter [%s] - hold [%s] has exceeded number of characters allowed", imptr.lineNnumberOfHeader+i+1, entry.MatterName, entry.HoldName))
+		}
+	}
+
+	if verr.hasErrors() {
+		return verr
+	}
+	return nil
+}
+
+func (imptr *LegalholdExcelImporter) findCustodianByNameAndEmail(name, email string) error {
+	var err error
+
+	opts := otlh.NewListOptions().WithFilterName(name)
+	custodians, err := imptr.client.GetCustodians(opts)
+	if err != nil {
+		return err
+	}
+
+	for _, custodian := range custodians {
+		if (custodian.Name == name) && (custodian.Email == email) {
+			log.Debug().Msgf("- [found] %s - %s", name, email)
+			return nil
+		}
+	}
+
+	return ErrorCustodianNotFound
+}
+
+func (imptr *LegalholdExcelImporter) verifyCustodians() error {
+	var verr *ValidationError = newValidationError(ErrorCustodianNotFound)
+
+	for email, name := range imptr.collections.UniqueCustodians {
+		err := imptr.findCustodianByNameAndEmail(name, email)
+		if err != nil {
+			verr.add(fmt.Errorf("custodian: %s email: %s not found", name, email))
+		}
+	}
+
+	if verr.hasErrors() {
+		return verr
+	}
+
+	return nil
+}
+
 func (imptr *LegalholdExcelImporter) PerformDataIntegrityCheck() error {
 	var err error
 	// verify the same matter under same folder
@@ -176,8 +231,18 @@ func (imptr *LegalholdExcelImporter) PerformDataIntegrityCheck() error {
 		return err
 	}
 
+	log.Debug().Msg("Verify hold name ...")
+	if err = imptr.verifyHoldName(); err != nil {
+		return err
+	}
+
 	log.Debug().Msg("Verify custodian email ...")
 	if err = imptr.verifyEmailAddress(); err != nil {
+		return err
+	}
+
+	log.Debug().Msg("Verify custodians ...")
+	if err = imptr.verifyCustodians(); err != nil {
 		return err
 	}
 
