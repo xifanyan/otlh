@@ -95,7 +95,7 @@ OPTIONS:
 #### Examples
 - Validate input data in excel file only
 ```
-./otlh.exe import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments --checkInputOnly
+./otlh.exe --Debug import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments --checkInputOnly
 ```
 
 - Import all legalholds from excel file, also convert datetime fields in PST to UTC.
