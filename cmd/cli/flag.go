@@ -83,6 +83,12 @@ var (
 		Usage:   "check input only",
 	}
 
+	SkipInputCheck = &cli.BoolFlag{
+		Name:    "skipInputCheck",
+		Aliases: []string{"sc"},
+		Usage:   "skip input check",
+	}
+
 	AtttachmentDirectory = &cli.StringFlag{
 		Name:    "attachmentDirectory",
 		Aliases: []string{"ad"},

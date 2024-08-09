@@ -241,11 +241,6 @@ func (imptr *LegalholdExcelImporter) PerformDataIntegrityCheck() error {
 		return err
 	}
 
-	log.Debug().Msg("Verify custodians ...")
-	if err = imptr.verifyCustodians(); err != nil {
-		return err
-	}
-
 	log.Debug().Msg("Verify same custodian under the same email ...")
 	if err = imptr.verifySameCustodianEmailUnderSameCustodianName(); err != nil {
 		return err
@@ -263,6 +258,11 @@ func (imptr *LegalholdExcelImporter) PerformDataIntegrityCheck() error {
 
 	log.Debug().Msg("Verify Released At field ...")
 	if err = imptr.verifyReleasedAt(); err != nil {
+		return err
+	}
+
+	log.Debug().Msg("Verify custodians ...")
+	if err = imptr.verifyCustodians(); err != nil {
 		return err
 	}
 

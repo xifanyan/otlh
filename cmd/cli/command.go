@@ -56,6 +56,7 @@ var (
 			HoldName,
 			MatterName,
 			CheckInputOnly,
+			SkipInputCheck,
 		},
 	}
 
@@ -224,13 +225,15 @@ func importLegalholds(ctx *cli.Context) error {
 		return err
 	}
 
-	err = imp.PerformDataIntegrityCheck()
-	if err != nil {
-		return err
-	}
+	if !ctx.Bool("skipInputCheck") {
+		err = imp.PerformDataIntegrityCheck()
+		if err != nil {
+			return err
+		}
 
-	if ctx.Bool("checkInputOnly") {
-		return nil
+		if ctx.Bool("checkInputOnly") {
+			return nil
+		}
 	}
 
 	err = imp.Import()

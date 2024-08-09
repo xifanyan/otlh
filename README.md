@@ -89,13 +89,19 @@ OPTIONS:
    --timezone value, --tz value             timezone for dates used in input file e.g., PST or EST (default: "UTC")
    --holdName value, --hn value             hold name
    --matterName value, --mn value           matter name
+   --skipInputCheck, --sc                   skip input check (default: false)
    --checkInputOnly, --ci                   check input only (default: false)
    --help, -h                               show help
 ```
 #### Examples
+- Skip Input Check
+```
+./otlh.exe --debug import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments --skipInputCheck`
+```
+
 - Validate input data in excel file only
 ```
-./otlh.exe --Debug import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments --checkInputOnly
+./otlh.exe --debug import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments --checkInputOnly
 ```
 
 - Import all legalholds from excel file, also convert datetime fields in PST to UTC.
