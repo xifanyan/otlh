@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
 	otlh "github.com/xifanyan/otlh/pkg"
@@ -57,6 +58,21 @@ var (
 			MatterName,
 			CheckInputOnly,
 			SkipInputCheck,
+		},
+		Before: func(c *cli.Context) error {
+			allowedTimezones := map[string]bool{
+				"CST": true,
+				"EST": true,
+				"MST": true,
+				"PST": true,
+				"UTC": true,
+			}
+
+			tz := c.String("timezone")
+			if !allowedTimezones[tz] {
+				return fmt.Errorf("timezone %s is not supported (UTC|CST|EST|MST|PST only)", tz)
+			}
+			return nil
 		},
 	}
 

@@ -115,12 +115,14 @@ func IsValidEmailAddress(email string) bool {
 
 func GetTimezoneLocation(tz string) string {
 	switch tz {
-	case "PST":
-		return "America/Los_Angeles"
+	case "CST":
+		return "America/Chicago"
 	case "EST":
 		return "America/New_York"
 	case "MST":
 		return "America/Denver"
+	case "PST":
+		return "America/Los_Angeles"
 	// Add more cases for other timezones if needed
 	default:
 		return "UTC"

@@ -99,7 +99,7 @@ var (
 	Timezone = &cli.StringFlag{
 		Name:    "timezone",
 		Aliases: []string{"tz"},
-		Usage:   "timezone for dates used in input file e.g., PST or EST",
+		Usage:   "timezone for dates used in input file, supproted timezones: PST|EST|MST|CST",
 		Value:   "UTC",
 	}
 )
