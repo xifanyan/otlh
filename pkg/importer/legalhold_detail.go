@@ -43,9 +43,9 @@ func convertDateTimeFormat(tz string, input string) (string, error) {
 		return "", fmt.Errorf("empty datetime")
 	}
 
-	if tz == "UTC" {
-		return input, nil
-	}
+	//	if tz == "UTC" {
+	//		return input, nil
+	//	}
 
 	loc, err := time.LoadLocation(tz)
 	if err != nil {
