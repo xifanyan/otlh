@@ -109,10 +109,14 @@ type CreateFolderBody struct {
 	ContactEmail                           string `json:"contact_email,omitempty"`
 	ContactPhone                           string `json:"contact_phone,omitempty"`
 	Notes                                  string `json:"notes,omitempty"`
+	GroupIDs                               []int  `json:"group_ids,omitempty"`
 }
 
+// TODO: enable group name support
 func NewCreateFolderBody() *CreateFolderBody {
-	return &CreateFolderBody{InheritEmailConfig: true}
+	return &CreateFolderBody{
+		InheritEmailConfig: true,
+	}
 }
 
 func (b *CreateFolderBody) WithName(name string) *CreateFolderBody {
@@ -120,3 +124,7 @@ func (b *CreateFolderBody) WithName(name string) *CreateFolderBody {
 	return b
 }
 
+func (b *CreateFolderBody) WithGroupIDs(groupIDs []int) *CreateFolderBody {
+	b.GroupIDs = groupIDs
+	return b
+}

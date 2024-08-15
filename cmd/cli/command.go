@@ -34,6 +34,7 @@ var (
 		Subcommands: []*cli.Command{
 			GetCustodiansCmd,
 			GetFoldersCmd,
+			GetGroupsCmd,
 			GetMattersCmd,
 			GetLegalholdsCmd,
 		},
@@ -101,6 +102,13 @@ var (
 
 	GetFoldersCmd = &cli.Command{
 		Name:     "folders",
+		Category: "get",
+		Action:   execute,
+		Flags:    DefaultListOptions,
+	}
+
+	GetGroupsCmd = &cli.Command{
+		Name:     "groups",
 		Category: "get",
 		Action:   execute,
 		Flags:    DefaultListOptions,
@@ -185,6 +193,8 @@ func execute(ctx *cli.Context) error {
 			return getMatters(ctx)
 		case "legalholds":
 			return getLegalholds(ctx)
+		case "groups":
+			return getGroups(ctx)
 		}
 	case "verify":
 		switch ctx.Command.Name {
@@ -306,6 +316,29 @@ func getFolders(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
+	printer := otlh.NewPrinter().JSON().Build()
+	printer.Print(v)
+	return nil
+}
+
+func getGroups(ctx *cli.Context) error {
+	var err error
+	var v any
+
+	client := NewClient(ctx)
+
+	if ctx.Int("id") > 0 {
+		v, err = client.GetGroup(ctx.Int("id"))
+	} else {
+		v, err = client.GetGroups(listOptions(ctx))
+	}
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%+v\n", v)
 
 	printer := otlh.NewPrinter().JSON().Build()
 	printer.Print(v)

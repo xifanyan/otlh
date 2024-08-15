@@ -106,11 +106,7 @@ func (b *ClientBuilder) Build() *Client {
 			"Content-Type": "application/json",
 		})
 
-		/*
-			if log.Logger.GetLevel() == zerolog.TraceLevel {
-			r.SetDebug(true)
-			}
-		*/
+	// r.SetDebug(true)
 
 	if b.skipVerify {
 		r.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
@@ -250,6 +246,41 @@ func (c *Client) GetFolders(opts Options) (Folders, error) {
 	}
 
 	return resp.Embedded.Folders, nil
+}
+
+func (c *Client) GetGroup(id int) (Group, error) {
+	var v []byte
+	var err error
+
+	group := Group{}
+
+	req, _ := NewRequest().WithTenant(c.tenant).Group().WithID(id).Build()
+	if v, err = c.Send(req); err != nil {
+		return group, err
+	}
+	if err = json.Unmarshal(v, &group); err != nil {
+		return group, err
+	}
+
+	return group, nil
+}
+
+func (c *Client) GetGroups(opts Options) (Groups, error) {
+	var err error
+
+	var body []byte
+	var resp GroupsResponse
+
+	req, _ := NewRequest().WithTenant(c.tenant).Get().Group().Build()
+	if body, err = c.Send(req, opts); err != nil {
+		return nil, err
+	}
+
+	if err = json.Unmarshal(body, &resp); err != nil {
+		return nil, err
+	}
+
+	return resp.Embedded.Groups, nil
 }
 
 func (c *Client) GetMatter(id int) (Matter, error) {
@@ -504,6 +535,7 @@ func (c *Client) FindFolderByName(name string) (Folder, error) {
  *
  * Parameters:
  * - name: the name of the folder to create
+ * - groupIDs: list of group ids to associate with the folder
  *
  * Returns:
  * - Folder: the newly created folder
@@ -513,13 +545,13 @@ func (c *Client) FindFolderByName(name string) (Folder, error) {
  * creation is successful, the new folder is returned. If an error occurs, the error
  * is returned.
  */
-func (c *Client) CreateFolder(name string) (Folder, error) {
+func (c *Client) CreateFolder(name string, groupIDs []int) (Folder, error) {
 	var err error
 	var respBody []byte
 
 	var folder Folder = Folder{}
 
-	var createFolder *CreateFolderBody = NewCreateFolderBody().WithName(name)
+	var createFolder *CreateFolderBody = NewCreateFolderBody().WithName(name).WithGroupIDs(groupIDs)
 
 	req, _ := NewRequest().WithTenant(c.tenant).Post().Folder().Build()
 
@@ -537,7 +569,6 @@ func (c *Client) CreateFolder(name string) (Folder, error) {
 	log.Debug().Msgf("created folder %s with id %d", name, folder.ID)
 
 	return folder, nil
-
 }
 
 /**
@@ -554,7 +585,13 @@ func (c *Client) FindOrCreateFolder(name string) (Folder, error) {
 
 	log.Debug().Msgf("folder [%s] not found, creating", name)
 
-	return c.CreateFolder(name)
+	group, err := c.FindGroupByName("All Admins")
+	if err != nil {
+		log.Debug().Msg("failed to find defalt admin group [All Admins]")
+		return Folder{}, err
+	}
+
+	return c.CreateFolder(name, []int{group.ID})
 }
 
 /**
@@ -668,4 +705,25 @@ func (c *Client) FindLegalhold(name string, matterID int) (Legalhold, error) {
 	}
 
 	return Legalhold{}, fmt.Errorf("legalhold [%s] not found", name)
+}
+
+func (c *Client) FindGroupByName(name string) (Group, error) {
+	var err error
+	var groups Groups = Groups{}
+
+	log.Debug().Msgf("searching groups by name [%s]", name)
+
+	opts := NewListOptions().WithFilterName(name)
+
+	if groups, err = c.GetGroups(opts); err != nil {
+		return Group{}, err
+	}
+
+	for _, group := range groups {
+		if group.Name == name {
+			return group, nil
+		}
+	}
+
+	return Group{}, fmt.Errorf("group [%s] not found", name)
 }

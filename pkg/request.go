@@ -53,6 +53,10 @@ func (req *Request) Folder() *FolderRequestBuilder {
 	return &FolderRequestBuilder{FolderRequest: &FolderRequest{Request: *req}}
 }
 
+func (req *Request) Group() *GroupRequestBuilder {
+	return &GroupRequestBuilder{GroupRequest: &GroupRequest{Request: *req}}
+}
+
 func (req *Request) Matter() *MatterRequestBuilder {
 	return &MatterRequestBuilder{MatterRequest: &MatterRequest{Request: *req}}
 }
