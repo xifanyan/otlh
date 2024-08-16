@@ -67,7 +67,8 @@ type FoldersResponse struct {
 }
 
 type FolderRequest struct {
-	id int
+	id      int
+	groupID int
 	Request
 }
 
@@ -80,12 +81,21 @@ func (b *FolderRequestBuilder) WithID(id int) *FolderRequestBuilder {
 	return b
 }
 
+func (b *FolderRequestBuilder) WithGroupID(groupID int) *FolderRequestBuilder {
+	b.groupID = groupID
+	return b
+}
+
 func (b *FolderRequestBuilder) Build() (*FolderRequest, error) {
 	return b.FolderRequest, nil
 }
 
 func (req *FolderRequest) Endpoint() string {
 	if req.id == 0 {
+		if req.groupID > 0 {
+			return fmt.Sprintf("/t/%s/api/%s/groups/%d/folders", req.tenant, APIVERSION, req.groupID)
+		}
+
 		return fmt.Sprintf("/t/%s/api/%s/folders", req.tenant, APIVERSION)
 	}
 	return fmt.Sprintf("/t/%s/api/%s/folders/%d", req.tenant, APIVERSION, req.id)

@@ -104,7 +104,10 @@ var (
 		Name:     "folders",
 		Category: "get",
 		Action:   execute,
-		Flags:    DefaultListOptions,
+		Flags: append(
+			DefaultListOptions,
+			GroupID,
+		),
 	}
 
 	GetGroupsCmd = &cli.Command{

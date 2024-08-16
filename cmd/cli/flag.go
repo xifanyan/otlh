@@ -34,6 +34,11 @@ var (
 		Usage: "folderID",
 	}
 
+	GroupID = &cli.IntFlag{
+		Name:  "groupID",
+		Usage: "group id",
+	}
+
 	MatterName = &cli.StringFlag{
 		Name:    "matterName",
 		Aliases: []string{"mn"},
