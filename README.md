@@ -73,25 +73,32 @@ GLOBAL OPTIONS:
 
 ### Import Legalhold
 ```
-./otlh.exe import legalholds -h
 NAME:
-   otlh import legalholds
+   otlh - Command Line Interface to access Opentext LegalHold service
 
 USAGE:
-   otlh import legalholds [command options] [arguments...]
+   otlh [global options] command [command options]
 
-CATEGORY:
+VERSION:
+   0.4.0-beta
+
+COMMANDS:
+   create
+   get
    import
+   verify
+   help, h  Shows a list of commands or help for one command
 
-OPTIONS:
-   --attachmentDirectory value, --ad value  attachment directory (default: ".")
-   --excel value, -e value                  excel file used for legalhold import
-   --timezone value, --tz value             timezone for dates used in input file e.g., PST or EST (default: "UTC")
-   --holdName value, --hn value             hold name
-   --matterName value, --mn value           matter name
-   --skipInputCheck, --sc                   skip input check (default: false)
-   --checkInputOnly, --ci                   check input only (default: false)
-   --help, -h                               show help
+GLOBAL OPTIONS:
+   --domain value, -x value     domain name for Opentext legahold service (default: "api.otlegalhold.com") [%LHN_DOMAIN%]
+   --port value, -p value       port (default: 443)
+   --tenant value, -t value     tenant name [%LHN_TENANT%]
+   --authToken value, -a value  token to access legalhold web service [%LHN_AUTHTOKEN%]
+   --config value, -c value     LHN json config file (default: ".otlh.json") [%LHN_CONFIG%]
+   --debug, -d                  Debug Mode (default: false)
+   --trace, -z                  Trace Mode (default: false)
+   --help, -h                   show help
+   --version, -v                print the version
 ```
 #### Examples
 - Skip Input Check
