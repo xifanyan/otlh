@@ -453,22 +453,15 @@ func (c *Client) FindFolderByName(name string) (Folder, error) {
  */
 func (c *Client) CreateFolder(name string, groupIDs []int) (Folder, error) {
 	var err error
-	var respBody []byte
-
 	var folder Folder = Folder{}
-
-	var createFolder *CreateFolderBody = NewCreateFolderBody().WithName(name).WithGroupIDs(groupIDs)
 
 	req, _ := NewRequest().WithTenant(c.tenant).Post().Folder().Build()
 
+	var createFolder *CreateFolderBody = NewCreateFolderBody().WithName(name).WithGroupIDs(groupIDs)
 	body, _ := json.Marshal(createFolder)
 	opts := NewBodyOptions().WithBody(string(body))
 
 	if err = c.Do(req, &folder, opts); err != nil {
-		return folder, err
-	}
-
-	if err = json.Unmarshal(respBody, &folder); err != nil {
 		return folder, err
 	}
 
@@ -541,22 +534,15 @@ func (c *Client) FindMatterByName(name string) (Matter, error) {
  */
 func (c *Client) CreateMatter(name string, folderID int) (Matter, error) {
 	var err error
-	var respBody []byte
-
 	var matter Matter = Matter{}
-
-	var createMatter *CreateMatterBody = NewCreateMatterBody().WithName(name).WithFolderID(folderID)
 
 	req, _ := NewRequest().WithTenant(c.tenant).Post().Matter().Build()
 
+	var createMatter *CreateMatterBody = NewCreateMatterBody().WithName(name).WithFolderID(folderID)
 	body, _ := json.Marshal(createMatter)
 	opts := NewBodyOptions().WithBody(string(body))
 
-	if respBody, err = c.Send(req, opts); err != nil {
-		return matter, err
-	}
-
-	if err = json.Unmarshal(respBody, &matter); err != nil {
+	if err = c.Do(req, &matter, opts); err != nil {
 		return matter, err
 	}
 
@@ -612,6 +598,14 @@ func (c *Client) FindLegalhold(name string, matterID int) (Legalhold, error) {
 	return Legalhold{}, fmt.Errorf("legalhold [%s] not found", name)
 }
 
+// FindGroupByName searches for a group by name.
+//
+// Parameters:
+// - name: the name of the group to search for.
+//
+// Returns:
+// - Group: the group found, or an empty Group if not found.
+// - error: any error that occurred during the search.
 func (c *Client) FindGroupByName(name string) (Group, error) {
 	var err error
 	var groups Groups = Groups{}
