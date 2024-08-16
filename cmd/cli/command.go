@@ -282,7 +282,12 @@ func getCustodians(ctx *cli.Context) error {
 	var err error
 	var v any
 
+	var req otlh.Requestor
+
 	client := NewClient(ctx)
+
+	b := otlh.NewRequest().WithTenant(client.Tenant()).Get().Custodian()
+	opts := listOptions(ctx)
 
 	if ctx.Bool("all") {
 		client.PrintAllCustodians()
@@ -290,9 +295,11 @@ func getCustodians(ctx *cli.Context) error {
 	}
 
 	if ctx.Int("id") > 0 {
-		v, err = client.GetCustodian(ctx.Int("id"))
+		req, _ = b.WithID(ctx.Int("id")).Build()
+		v, err = client.GetCustodian(req)
 	} else {
-		v, err = client.GetCustodians(listOptions(ctx))
+		req, _ = b.Build()
+		v, err = client.GetCustodians(req, opts)
 	}
 
 	if err != nil {
@@ -308,12 +315,22 @@ func getFolders(ctx *cli.Context) error {
 	var err error
 	var v any
 
+	var req otlh.Requestor
+
 	client := NewClient(ctx)
 
+	b := otlh.NewRequest().WithTenant(client.Tenant()).Get().Folder()
+	opts := listOptions(ctx)
+
 	if ctx.Int("id") > 0 {
-		v, err = client.GetFolder(ctx.Int("id"))
+		req, _ = b.WithID(ctx.Int("id")).Build()
+		v, err = client.GetFolder(req)
 	} else {
-		v, err = client.GetFolders(listOptions(ctx))
+		if ctx.Int("groupID") > 0 {
+			b.WithGroupID(ctx.Int("groupID"))
+		}
+		req, _ = b.Build()
+		v, err = client.GetFolders(req, opts)
 	}
 
 	if err != nil {
@@ -329,19 +346,23 @@ func getGroups(ctx *cli.Context) error {
 	var err error
 	var v any
 
-	client := NewClient(ctx)
+	var req otlh.Requestor
 
+	client := NewClient(ctx)
+	opts := listOptions(ctx)
+
+	b := otlh.NewRequest().WithTenant(client.Tenant()).Get().Group()
 	if ctx.Int("id") > 0 {
-		v, err = client.GetGroup(ctx.Int("id"))
+		req, _ = b.WithID(ctx.Int("id")).Build()
+		v, err = client.GetGroup(req)
 	} else {
-		v, err = client.GetGroups(listOptions(ctx))
+		req, _ = b.Build()
+		v, err = client.GetGroups(req, opts)
 	}
 
 	if err != nil {
 		return err
 	}
-
-	fmt.Printf("%+v\n", v)
 
 	printer := otlh.NewPrinter().JSON().Build()
 	printer.Print(v)
@@ -352,12 +373,18 @@ func getMatters(ctx *cli.Context) error {
 	var err error
 	var v any
 
-	client := NewClient(ctx)
+	var req otlh.Requestor
 
+	client := NewClient(ctx)
+	opts := listOptions(ctx)
+
+	b := otlh.NewRequest().WithTenant(client.Tenant()).Get().Matter()
 	if ctx.Int("id") > 0 {
-		v, err = client.GetMatter(ctx.Int("id"))
+		req, _ = b.WithID(ctx.Int("id")).Build()
+		v, err = client.GetMatter(req)
 	} else {
-		v, err = client.GetMatters(listOptions(ctx))
+		req, _ = b.Build()
+		v, err = client.GetMatters(req, opts)
 	}
 
 	if err != nil {
@@ -373,12 +400,18 @@ func getLegalholds(ctx *cli.Context) error {
 	var err error
 	var v any
 
-	client := NewClient(ctx)
+	var req otlh.Requestor
 
+	client := NewClient(ctx)
+	opts := listOptions(ctx)
+
+	b := otlh.NewRequest().WithTenant(client.Tenant()).Get().Legalhold()
 	if ctx.Int("id") > 0 {
-		v, err = client.GetLegalhold(ctx.Int("id"))
+		req, _ = b.WithID(ctx.Int("id")).Build()
+		v, err = client.GetLegalhold(req)
 	} else {
-		v, err = client.GetLegalholds(listOptions(ctx))
+		req, _ = b.Build()
+		v, err = client.GetLegalholds(req, opts)
 	}
 
 	if err != nil {

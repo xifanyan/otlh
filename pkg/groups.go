@@ -64,5 +64,5 @@ func (req *GroupRequest) Endpoint() string {
 	if req.id == 0 {
 		return fmt.Sprintf("/t/%s/api/%s/groups", req.tenant, APIVERSION)
 	}
-	return fmt.Sprintf("/t/%s/api/%s/group/%d", req.tenant, APIVERSION, req.id)
+	return fmt.Sprintf("/t/%s/api/%s/groups/%d", req.tenant, APIVERSION, req.id)
 }

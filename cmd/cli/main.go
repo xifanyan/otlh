@@ -57,12 +57,21 @@ func main() {
 				Usage:   "Debug Mode: Log to stderr",
 				Value:   false,
 			},
+			&cli.BoolFlag{
+				Name:    "trace",
+				Aliases: []string{"z"},
+				Usage:   "Trace Mode",
+				Value:   false,
+			},
 		},
 		Commands: Commands,
 		Before: func(c *cli.Context) error {
 			zerolog.SetGlobalLevel(zerolog.InfoLevel)
 			if c.Bool("debug") {
 				zerolog.SetGlobalLevel(zerolog.DebugLevel)
+			}
+			if c.Bool("trace") {
+				zerolog.SetGlobalLevel(zerolog.TraceLevel)
 			}
 			log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 			return nil

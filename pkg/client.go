@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -106,7 +107,9 @@ func (b *ClientBuilder) Build() *Client {
 			"Content-Type": "application/json",
 		})
 
-	// r.SetDebug(true)
+	if zerolog.GlobalLevel() == zerolog.TraceLevel {
+		r.SetDebug(true)
+	}
 
 	if b.skipVerify {
 		r.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
@@ -131,6 +134,10 @@ func handleOptions(r *resty.Request, opts ...Options) (bool, error) {
 		}
 	}
 	return isMultipart, nil
+}
+
+func (c *Client) Tenant() string {
+	return c.tenant
 }
 
 /*
@@ -180,179 +187,70 @@ func (c *Client) Send(req Requestor, opts ...Options) ([]byte, error) {
 	return resp.Body(), nil
 }
 
-func (c *Client) GetCustodian(id int) (Custodian, error) {
+func (c *Client) Do(req Requestor, entity interface{}, opts ...Options) error {
 	var v []byte
 	var err error
 
-	custodian := Custodian{}
-
-	req, _ := NewRequest().WithTenant(c.tenant).Custodian().WithID(id).Build()
-	if v, err = c.Send(req); err != nil {
-		return custodian, err
-	}
-	if err = json.Unmarshal(v, &custodian); err != nil {
-		return custodian, err
+	if v, err = c.Send(req, opts...); err != nil {
+		return err
 	}
 
-	return custodian, nil
+	return json.Unmarshal(v, entity)
 }
 
-func (c *Client) GetCustodians(opts Options) (Custodians, error) {
-	var v []byte
-	var err error
+func (c *Client) GetCustodian(req Requestor) (Custodian, error) {
+	var custodian Custodian
+	return custodian, c.Do(req, &custodian)
+}
 
+func (c *Client) GetCustodians(req Requestor, opts ...Options) (Custodians, error) {
 	var resp CustodiansResponse
-
-	req, _ := NewRequest().WithTenant(c.tenant).Get().Custodian().Build()
-	if v, err = c.Send(req, opts); err != nil {
-		return nil, err
-	}
-	if err = json.Unmarshal(v, &resp); err != nil {
-		return nil, err
-	}
-	return resp.Embedded.Custodians, nil
+	err := c.Do(req, &resp, opts...)
+	return resp.Embedded.Custodians, err
 }
 
-func (c *Client) GetFolder(id int) (Folder, error) {
-	var v []byte
-	var err error
-
-	folder := Folder{}
-
-	req, _ := NewRequest().WithTenant(c.tenant).Folder().WithID(id).Build()
-	if v, err = c.Send(req); err != nil {
-		return folder, err
-	}
-	if err = json.Unmarshal(v, &folder); err != nil {
-		return folder, err
-	}
-
-	return folder, nil
+func (c *Client) GetGroup(req Requestor) (Group, error) {
+	var group Group
+	return group, c.Do(req, &group)
 }
 
-func (c *Client) GetFolders(opts Options) (Folders, error) {
-	var err error
-
-	var body []byte
-	var resp FoldersResponse
-
-	req, _ := NewRequest().WithTenant(c.tenant).Get().Folder().Build()
-	if body, err = c.Send(req, opts); err != nil {
-		return nil, err
-	}
-
-	if err = json.Unmarshal(body, &resp); err != nil {
-		return nil, err
-	}
-
-	return resp.Embedded.Folders, nil
-}
-
-func (c *Client) GetGroup(id int) (Group, error) {
-	var v []byte
-	var err error
-
-	group := Group{}
-
-	req, _ := NewRequest().WithTenant(c.tenant).Group().WithID(id).Build()
-	if v, err = c.Send(req); err != nil {
-		return group, err
-	}
-	if err = json.Unmarshal(v, &group); err != nil {
-		return group, err
-	}
-
-	return group, nil
-}
-
-func (c *Client) GetGroups(opts Options) (Groups, error) {
-	var err error
-
-	var body []byte
+func (c *Client) GetGroups(req Requestor, opts ...Options) (Groups, error) {
 	var resp GroupsResponse
-
-	req, _ := NewRequest().WithTenant(c.tenant).Get().Group().Build()
-	if body, err = c.Send(req, opts); err != nil {
-		return nil, err
-	}
-
-	if err = json.Unmarshal(body, &resp); err != nil {
-		return nil, err
-	}
-
-	return resp.Embedded.Groups, nil
+	err := c.Do(req, &resp, opts...)
+	return resp.Embedded.Groups, err
 }
 
-func (c *Client) GetMatter(id int) (Matter, error) {
-	var v []byte
-	var err error
-
-	matter := Matter{}
-
-	req, _ := NewRequest().WithTenant(c.tenant).Matter().WithID(id).Build()
-	if v, err = c.Send(req); err != nil {
-		return matter, err
-	}
-	if err = json.Unmarshal(v, &matter); err != nil {
-		return matter, err
-	}
-
-	return matter, nil
+func (c *Client) GetFolder(req Requestor) (Folder, error) {
+	var folder Folder
+	return folder, c.Do(req, &folder)
 }
 
-func (c *Client) GetMatters(opts Options) (Matters, error) {
-	var err error
+func (c *Client) GetFolders(req Requestor, opts ...Options) (Folders, error) {
+	var resp FoldersResponse
+	err := c.Do(req, &resp, opts...)
+	return resp.Embedded.Folders, err
+}
 
-	var body []byte
+func (c *Client) GetMatter(req Requestor) (Matter, error) {
+	var matter Matter
+	return matter, c.Do(req, &matter)
+}
+
+func (c *Client) GetMatters(req Requestor, opts ...Options) (Matters, error) {
 	var resp MattersResponse
-
-	req, _ := NewRequest().WithTenant(c.tenant).Get().Matter().Build()
-
-	if body, err = c.Send(req, opts); err != nil {
-		return nil, err
-	}
-
-	if err = json.Unmarshal(body, &resp); err != nil {
-		return nil, err
-	}
-
-	return resp.Embedded.Matters, nil
+	err := c.Do(req, &resp, opts...)
+	return resp.Embedded.Matters, err
 }
 
-func (c *Client) GetLegalhold(id int) (Legalhold, error) {
-	var v []byte
-	var err error
-
-	legalhold := Legalhold{}
-
-	req, _ := NewRequest().WithTenant(c.tenant).Legalhold().WithID(id).Build()
-	if v, err = c.Send(req); err != nil {
-		return legalhold, err
-	}
-	if err = json.Unmarshal(v, &legalhold); err != nil {
-		return legalhold, err
-	}
-
-	return legalhold, nil
+func (c *Client) GetLegalhold(req Requestor) (Legalhold, error) {
+	var legalhold Legalhold
+	return legalhold, c.Do(req, &legalhold)
 }
 
-func (c *Client) GetLegalholds(opts Options) (Legalholds, error) {
-	var err error
-
-	var body []byte
+func (c *Client) GetLegalholds(req Requestor, opts ...Options) (Legalholds, error) {
 	var resp LegalholdsResponse
-
-	req, _ := NewRequest().WithTenant(c.tenant).Get().Legalhold().Build()
-
-	if body, err = c.Send(req, opts); err != nil {
-		return nil, err
-	}
-
-	if err = json.Unmarshal(body, &resp); err != nil {
-		return nil, err
-	}
-
-	return resp.Embedded.Legalholds, nil
+	err := c.Do(req, &resp, opts...)
+	return resp.Embedded.Legalholds, err
 }
 
 /**
@@ -514,9 +412,10 @@ func (c *Client) FindFolderByName(name string) (Folder, error) {
 	/*
 		filterName helps to limit the results to folders CONTAINING the provided name.
 	*/
+	req, _ := NewRequest().WithTenant(c.tenant).Get().Folder().Build()
 	opts := NewListOptions().WithFilterName(name)
 
-	if folders, err = c.GetFolders(opts); err != nil {
+	if folders, err = c.GetFolders(req, opts); err != nil {
 		return Folder{}, err
 	}
 
@@ -558,7 +457,7 @@ func (c *Client) CreateFolder(name string, groupIDs []int) (Folder, error) {
 	body, _ := json.Marshal(createFolder)
 	opts := NewBodyOptions().WithBody(string(body))
 
-	if respBody, err = c.Send(req, opts); err != nil {
+	if err = c.Do(req, &folder, opts); err != nil {
 		return folder, err
 	}
 
@@ -610,9 +509,10 @@ func (c *Client) FindMatterByName(name string) (Matter, error) {
 	/*
 		filterName helps to limit the results to folders CONTAINING the provided name.
 	*/
+	req, _ := NewRequest().WithTenant(c.tenant).Get().Matter().Build()
 	opts := NewListOptions().WithFilterName(name)
 
-	if matters, err = c.GetMatters(opts); err != nil {
+	if matters, err = c.GetMatters(req, opts); err != nil {
 		return Matter{}, err
 	}
 
@@ -689,12 +589,10 @@ func (c *Client) FindLegalhold(name string, matterID int) (Legalhold, error) {
 
 	log.Debug().Msgf("searching legalhold by name [%s] and matterID [%d]", name, matterID)
 
-	/*
-		filterName helps to limit the results to folders CONTAINING the provided name.
-	*/
+	req, _ := NewRequest().WithTenant(c.tenant).Get().Legalhold().Build()
 	opts := NewListOptions().WithFilterName(name)
 
-	if legalholds, err = c.GetLegalholds(opts); err != nil {
+	if legalholds, err = c.GetLegalholds(req, opts); err != nil {
 		return Legalhold{}, err
 	}
 
@@ -713,9 +611,10 @@ func (c *Client) FindGroupByName(name string) (Group, error) {
 
 	log.Debug().Msgf("searching groups by name [%s]", name)
 
+	req, _ := NewRequest().WithTenant(c.tenant).Get().Group().Build()
 	opts := NewListOptions().WithFilterName(name)
 
-	if groups, err = c.GetGroups(opts); err != nil {
+	if groups, err = c.GetGroups(req, opts); err != nil {
 		return Group{}, err
 	}
 

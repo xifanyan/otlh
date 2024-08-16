@@ -190,8 +190,9 @@ func (imptr *LegalholdExcelImporter) verifyHoldName() error {
 func (imptr *LegalholdExcelImporter) findCustodianByNameAndEmail(name, email string) error {
 	var err error
 
+	req, _ := otlh.NewRequest().WithTenant(imptr.client.Tenant()).Get().Custodian().Build()
 	opts := otlh.NewListOptions().WithFilterName(name)
-	custodians, err := imptr.client.GetCustodians(opts)
+	custodians, err := imptr.client.GetCustodians(req, opts)
 	if err != nil {
 		return err
 	}
