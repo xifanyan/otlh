@@ -14,7 +14,7 @@ func main() {
 
 	app := &cli.App{
 		Name:    "otlh",
-		Version: "0.3.7-beta",
+		Version: "0.4.0-beta",
 		Usage:   "Command Line Interface to access Opentext LegalHold service",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
@@ -54,7 +54,7 @@ func main() {
 			&cli.BoolFlag{
 				Name:    "debug",
 				Aliases: []string{"d"},
-				Usage:   "Debug Mode: Log to stderr",
+				Usage:   "Debug Mode",
 				Value:   false,
 			},
 			&cli.BoolFlag{

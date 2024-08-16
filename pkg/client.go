@@ -187,7 +187,18 @@ func (c *Client) Send(req Requestor, opts ...Options) ([]byte, error) {
 	return resp.Body(), nil
 }
 
-func (c *Client) Do(req Requestor, entity interface{}, opts ...Options) error {
+/*
+Do sends a request and unmarshals the response into a given resource.
+
+Parameters:
+- req: The request to send
+- resource: The object to unmarshal the response into
+- opts: Optional parameters for the request
+
+Returns:
+- error: Any error that occurred during the request or unmarshalling
+*/
+func (c *Client) Do(req Requestor, resource any, opts ...Options) error {
 	var v []byte
 	var err error
 
@@ -195,7 +206,7 @@ func (c *Client) Do(req Requestor, entity interface{}, opts ...Options) error {
 		return err
 	}
 
-	return json.Unmarshal(v, entity)
+	return json.Unmarshal(v, resource)
 }
 
 func (c *Client) GetCustodian(req Requestor) (Custodian, error) {
@@ -205,8 +216,7 @@ func (c *Client) GetCustodian(req Requestor) (Custodian, error) {
 
 func (c *Client) GetCustodians(req Requestor, opts ...Options) (Custodians, error) {
 	var resp CustodiansResponse
-	err := c.Do(req, &resp, opts...)
-	return resp.Embedded.Custodians, err
+	return resp.Embedded.Custodians, c.Do(req, &resp, opts...)
 }
 
 func (c *Client) GetGroup(req Requestor) (Group, error) {
@@ -216,8 +226,7 @@ func (c *Client) GetGroup(req Requestor) (Group, error) {
 
 func (c *Client) GetGroups(req Requestor, opts ...Options) (Groups, error) {
 	var resp GroupsResponse
-	err := c.Do(req, &resp, opts...)
-	return resp.Embedded.Groups, err
+	return resp.Embedded.Groups, c.Do(req, &resp, opts...)
 }
 
 func (c *Client) GetFolder(req Requestor) (Folder, error) {
@@ -227,8 +236,7 @@ func (c *Client) GetFolder(req Requestor) (Folder, error) {
 
 func (c *Client) GetFolders(req Requestor, opts ...Options) (Folders, error) {
 	var resp FoldersResponse
-	err := c.Do(req, &resp, opts...)
-	return resp.Embedded.Folders, err
+	return resp.Embedded.Folders, c.Do(req, &resp, opts...)
 }
 
 func (c *Client) GetMatter(req Requestor) (Matter, error) {
@@ -238,8 +246,7 @@ func (c *Client) GetMatter(req Requestor) (Matter, error) {
 
 func (c *Client) GetMatters(req Requestor, opts ...Options) (Matters, error) {
 	var resp MattersResponse
-	err := c.Do(req, &resp, opts...)
-	return resp.Embedded.Matters, err
+	return resp.Embedded.Matters, c.Do(req, &resp, opts...)
 }
 
 func (c *Client) GetLegalhold(req Requestor) (Legalhold, error) {
