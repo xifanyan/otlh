@@ -260,6 +260,17 @@ func (c *Client) GetLegalholds(req Requestor, opts ...Options) (Legalholds, erro
 	return resp.Embedded.Legalholds, err
 }
 
+func (c *Client) GetSilenthold(req Requestor) (Silenthold, error) {
+	var silenthold Silenthold
+	return silenthold, c.Do(req, &silenthold)
+}
+
+func (c *Client) GetSilentholds(req Requestor, opts ...Options) (Silentholds, error) {
+	var resp SilentholdsResponse
+	err := c.Do(req, &resp, opts...)
+	return resp.Embedded.Silentholds, err
+}
+
 /**
  * GetAllCustodians retrieves all custodians from the API, paginating through results as needed.
  *

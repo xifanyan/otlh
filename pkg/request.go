@@ -49,6 +49,10 @@ func (req *Request) Legalhold() *LegalholdRequestBuilder {
 	return &LegalholdRequestBuilder{LegalholdRequest: &LegalholdRequest{Request: *req}}
 }
 
+func (req *Request) Silenthold() *SilentholdRequestBuilder {
+	return &SilentholdRequestBuilder{SilentholdRequest: &SilentholdRequest{Request: *req}}
+}
+
 func (req *Request) Folder() *FolderRequestBuilder {
 	return &FolderRequestBuilder{FolderRequest: &FolderRequest{Request: *req}}
 }
