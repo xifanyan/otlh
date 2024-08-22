@@ -9,10 +9,10 @@ import (
 
 const MAX_LENGTH_OF_HOLDNAME int = 100
 
-var HoldDetailsHeader = []string{"Matter id", "Hold Name", "Hold notice subject", "Hold notice body", "Hold notice title", "Hold notice attachment names"}
+var LegalholdDetailsHeader = []string{"Matter id", "Hold Name", "Hold notice subject", "Hold notice body", "Hold notice title", "Hold notice attachment names"}
 var CustodianDetailsHeader = []string{"Name", "Email", "sent_at", "acknowledged_at", "released_at"}
 
-type HoldDetail struct {
+type LegalholdInfo struct {
 	MatterName                string
 	MatterID                  string `json:"Matter id"`
 	HoldName                  string `json:"Hold Name"`
@@ -32,7 +32,7 @@ type CustodianDetail struct {
 
 type LegalholdDetail struct {
 	FolderName       string
-	HoldDetail       HoldDetail
+	LegalholdInfo    LegalholdInfo
 	CustodianDetails []CustodianDetail
 }
 
@@ -70,15 +70,15 @@ func (lhd LegalholdDetail) saveToExcel(dir string, tz string) error {
 	defer f.Close()
 
 	f.NewSheet("hold_details")
-	f.SetSheetRow("hold_details", "A1", &HoldDetailsHeader)
+	f.SetSheetRow("hold_details", "A1", &LegalholdDetailsHeader)
 	f.SetSheetRow("hold_details", "A2",
 		&[]interface{}{
-			lhd.HoldDetail.MatterID,
-			lhd.HoldDetail.HoldName,
-			lhd.HoldDetail.HoldNoticeSubject,
-			lhd.HoldDetail.HoldNoticeBody,
-			lhd.HoldDetail.HoldNoticeTitle,
-			lhd.HoldDetail.HoldNoticeAttachmentNames,
+			lhd.LegalholdInfo.MatterID,
+			lhd.LegalholdInfo.HoldName,
+			lhd.LegalholdInfo.HoldNoticeSubject,
+			lhd.LegalholdInfo.HoldNoticeBody,
+			lhd.LegalholdInfo.HoldNoticeTitle,
+			lhd.LegalholdInfo.HoldNoticeAttachmentNames,
 		},
 	)
 

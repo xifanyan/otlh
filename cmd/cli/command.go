@@ -259,7 +259,7 @@ func importLegalholds(ctx *cli.Context) error {
 		WithHoldName(ctx.String("holdName")).
 		WithAttachmentDirectory(ctx.String("attachmentDirectory"))
 
-	err = imp.LoadHoldData()
+	err = imp.LoadLegalholdData()
 	if err != nil {
 		return err
 	}
