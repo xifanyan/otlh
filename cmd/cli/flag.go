@@ -105,7 +105,7 @@ var (
 	Zipfile = &cli.StringFlag{
 		Name:    "zipfile",
 		Aliases: []string{"z"},
-		Usage:   "zipfile",
+		Usage:   "zip package for importing holds e.g., legal_hold_details.zip",
 		Value:   "",
 	}
 )
