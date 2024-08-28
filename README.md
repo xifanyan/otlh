@@ -72,7 +72,7 @@ GLOBAL OPTIONS:
 }
 ```
 
-### Import Legalhold
+### Import Legalholds (silentholds)
 ```
 NAME:
    otlh import legalholds
@@ -86,14 +86,19 @@ CATEGORY:
 OPTIONS:
    --attachmentDirectory value, --ad value  attachment directory (default: ".")
    --excel value, -e value                  excel file used for legalhold import
+   --zipfile value, -z value                zipfile
    --timezone value, --tz value             timezone for dates used in input file, supproted timezones: PST|EST|MST|CST (default: "UTC")
    --holdName value, --hn value             hold name
    --matterName value, --mn value           matter name
    --checkInputOnly, --ci                   check input only (default: false)
-   --skipInputCheck, --sc                   skip input check (default: false)
    --help, -h                               show help
 ```
 #### Examples
+- Import zip package directly via command line
+```
+./otlh.exe --debug import legalholds --zipfile=../testdata/legal_hold_details.zip
+```
+
 - Validate input data in excel file only
 ```
 ./otlh.exe --debug import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments --checkInputOnly
