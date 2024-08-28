@@ -7,10 +7,8 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-const MAX_LENGTH_OF_HOLDNAME int = 100
-
 var LegalholdDetailsHeader = []string{"Matter id", "Hold Name", "Hold notice subject", "Hold notice body", "Hold notice title", "Hold notice attachment names"}
-var CustodianDetailsHeader = []string{"Name", "Email", "sent_at", "acknowledged_at", "released_at"}
+var LegalholdCustodianDetailsHeader = []string{"Name", "Email", "sent_at", "acknowledged_at", "released_at"}
 
 type LegalholdInfo struct {
 	MatterName                string
@@ -20,14 +18,6 @@ type LegalholdInfo struct {
 	HoldNoticeTitle           string `json:"Hold notice title"`
 	HoldNoticeBody            string `json:"Hold notice body"`
 	HoldNoticeAttachmentNames string `json:"Hold notice attachment names"`
-}
-
-type CustodianDetail struct {
-	Name          string `json:"name"`
-	Email         string `json:"email"`
-	SentAt        string `json:"sent_at"`
-	AcknowlegedAt string `json:"acknowledged_at"`
-	ReleasedAt    string `json:"released_at"`
 }
 
 type LegalholdDetail struct {
@@ -69,9 +59,9 @@ func (lhd LegalholdDetail) saveToExcel(dir string, tz string) error {
 	f := excelize.NewFile()
 	defer f.Close()
 
-	f.NewSheet("hold_details")
-	f.SetSheetRow("hold_details", "A1", &LegalholdDetailsHeader)
-	f.SetSheetRow("hold_details", "A2",
+	f.NewSheet(SHEET_NAME_HOLD_DETAILS)
+	f.SetSheetRow(SHEET_NAME_HOLD_DETAILS, "A1", &LegalholdDetailsHeader)
+	f.SetSheetRow(SHEET_NAME_HOLD_DETAILS, "A2",
 		&[]interface{}{
 			lhd.LegalholdInfo.MatterID,
 			lhd.LegalholdInfo.HoldName,
@@ -82,8 +72,8 @@ func (lhd LegalholdDetail) saveToExcel(dir string, tz string) error {
 		},
 	)
 
-	f.NewSheet("custodian_details")
-	f.SetSheetRow("custodian_details", "A1", &CustodianDetailsHeader)
+	f.NewSheet(SHEET_NAME_CUSTODIANS_DETAILS)
+	f.SetSheetRow(SHEET_NAME_CUSTODIANS_DETAILS, "A1", &LegalholdCustodianDetailsHeader)
 	for i, custodianDetail := range lhd.CustodianDetails {
 		row := []interface{}{
 			custodianDetail.Name,
@@ -102,7 +92,7 @@ func (lhd LegalholdDetail) saveToExcel(dir string, tz string) error {
 			row = append(row, releasedAt)
 		}
 
-		f.SetSheetRow("custodian_details", fmt.Sprintf("A%d", i+2), &row)
+		f.SetSheetRow(SHEET_NAME_CUSTODIANS_DETAILS, fmt.Sprintf("A%d", i+2), &row)
 	}
 
 	// delete detaful sheet "Sheet1"

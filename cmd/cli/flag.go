@@ -88,12 +88,6 @@ var (
 		Usage:   "check input only",
 	}
 
-	SkipInputCheck = &cli.BoolFlag{
-		Name:    "skipInputCheck",
-		Aliases: []string{"sc"},
-		Usage:   "skip input check",
-	}
-
 	AtttachmentDirectory = &cli.StringFlag{
 		Name:    "attachmentDirectory",
 		Aliases: []string{"ad"},
@@ -106,6 +100,13 @@ var (
 		Aliases: []string{"tz"},
 		Usage:   "timezone for dates used in input file, supproted timezones: PST|EST|MST|CST",
 		Value:   "UTC",
+	}
+
+	Zipfile = &cli.StringFlag{
+		Name:    "zipfile",
+		Aliases: []string{"z"},
+		Usage:   "zipfile",
+		Value:   "",
 	}
 )
 

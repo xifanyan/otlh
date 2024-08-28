@@ -407,6 +407,26 @@ func (c *Client) ImportLegalhold(zipFile string) (Legalhold, error) {
 	return resp, nil
 }
 
+func (c *Client) ImportSilenthold(zipFile string) (Silenthold, error) {
+	var err error
+
+	var respBody []byte
+	var resp Silenthold = Silenthold{}
+
+	req, _ := NewRequest().WithTenant(c.tenant).Post().Silenthold().Import().Build()
+	opts := NewFileOptions().WithFile("silent_hold_details", zipFile)
+
+	if respBody, err = c.Send(req, opts); err != nil {
+		return resp, err
+	}
+
+	if err = json.Unmarshal(respBody, &resp); err != nil {
+		return resp, err
+	}
+
+	return resp, nil
+}
+
 /**
  * FindFolderByName finds a folder by its exact name.
  *
@@ -607,6 +627,28 @@ func (c *Client) FindLegalhold(name string, matterID int) (Legalhold, error) {
 	}
 
 	return Legalhold{}, fmt.Errorf("legalhold [%s] not found", name)
+}
+
+func (c *Client) FindSilenthold(name string, matterID int) (Silenthold, error) {
+	var err error
+	var silentholds Silentholds = Silentholds{}
+
+	log.Debug().Msgf("searching legalhold by name [%s] and matterID [%d]", name, matterID)
+
+	req, _ := NewRequest().WithTenant(c.tenant).Get().Silenthold().Build()
+	opts := NewListOptions().WithFilterName(name)
+
+	if silentholds, err = c.GetSilentholds(req, opts); err != nil {
+		return Silenthold{}, err
+	}
+
+	for _, silenthold := range silentholds {
+		if silenthold.Name == name && silenthold.MatterID == matterID {
+			return silenthold, nil
+		}
+	}
+
+	return Silenthold{}, fmt.Errorf("silent [%s] not found", name)
 }
 
 // FindGroupByName searches for a group by name.

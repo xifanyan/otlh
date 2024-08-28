@@ -75,7 +75,8 @@ type SilentholdRequestBuilder struct {
 }
 
 type SilentholdRequest struct {
-	id int
+	id     int
+	action HoldAction
 	Request
 }
 
@@ -84,11 +85,20 @@ func (b *SilentholdRequestBuilder) WithID(id int) *SilentholdRequestBuilder {
 	return b
 }
 
+func (b *SilentholdRequestBuilder) Import() *SilentholdRequestBuilder {
+	b.action = IMPORT
+	return b
+}
+
 func (b *SilentholdRequestBuilder) Build() (*SilentholdRequest, error) {
 	return b.SilentholdRequest, nil
 }
 
 func (req *SilentholdRequest) Endpoint() string {
+	if req.action == IMPORT {
+		return fmt.Sprintf("/t/%s/api/%s/silent_holds/import", req.tenant, APIVERSION)
+	}
+
 	if req.id > 0 {
 		return fmt.Sprintf("/t/%s/api/%s/silent_holds/%d", req.tenant, APIVERSION, req.id)
 	}

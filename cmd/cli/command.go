@@ -20,6 +20,21 @@ type ClientConfig struct {
 	AuthToken string `json:"authToken"`
 }
 
+func checkTimezone(tz string) error {
+	allowedTimezones := map[string]bool{
+		"CST": true,
+		"EST": true,
+		"MST": true,
+		"PST": true,
+		"UTC": true,
+	}
+	if !allowedTimezones[tz] {
+		return fmt.Errorf("timezone %s is not supported (UTC|CST|EST|MST|PST only)", tz)
+
+	}
+	return nil
+}
+
 var (
 	CreateCmd = &cli.Command{
 		Name: "create",
@@ -45,6 +60,7 @@ var (
 		Name: "import",
 		Subcommands: []*cli.Command{
 			ImportLegalholdsCmd,
+			ImportSilentholdsCmd,
 		},
 	}
 
@@ -55,26 +71,31 @@ var (
 		Flags: []cli.Flag{
 			AtttachmentDirectory,
 			Excel,
+			Zipfile,
 			Timezone,
 			HoldName,
 			MatterName,
 			CheckInputOnly,
-			SkipInputCheck,
 		},
 		Before: func(c *cli.Context) error {
-			allowedTimezones := map[string]bool{
-				"CST": true,
-				"EST": true,
-				"MST": true,
-				"PST": true,
-				"UTC": true,
-			}
+			return checkTimezone(c.String("timezone"))
+		},
+	}
 
-			tz := c.String("timezone")
-			if !allowedTimezones[tz] {
-				return fmt.Errorf("timezone %s is not supported (UTC|CST|EST|MST|PST only)", tz)
-			}
-			return nil
+	ImportSilentholdsCmd = &cli.Command{
+		Name:     "silentholds",
+		Category: "import",
+		Action:   execute,
+		Flags: []cli.Flag{
+			Excel,
+			Zipfile,
+			Timezone,
+			HoldName,
+			MatterName,
+			CheckInputOnly,
+		},
+		Before: func(c *cli.Context) error {
+			return checkTimezone(c.String("timezone"))
 		},
 	}
 
@@ -191,8 +212,11 @@ func execute(ctx *cli.Context) error {
 			return createMatter(ctx)
 		}
 	case "import":
-		if ctx.Command.Name == "legalholds" {
+		switch ctx.Command.Name {
+		case "legalholds":
 			return importLegalholds(ctx)
+		case "silentholds":
+			return importSilentholds(ctx)
 		}
 	case "get":
 		switch ctx.Command.Name {
@@ -248,15 +272,29 @@ func NewClient(ctx *cli.Context) *otlh.Client {
 func importLegalholds(ctx *cli.Context) error {
 	var err error
 
+	client := NewClient(ctx)
+
+	zip := ctx.String("zipfile")
+	if len(zip) > 0 {
+		if _, err := os.Stat(zip); err == nil || os.IsExist(err) {
+			if _, err = client.ImportLegalhold(zip); err != nil {
+				log.Error().Msgf("failed to import Legalhold from zip file: %s, %s", zip, err)
+				return err
+			}
+		}
+		return err
+	}
+
 	tz := otlh.GetTimezoneLocation(ctx.String("timezone"))
 	log.Debug().Msgf("timezone: %s", tz)
 
-	imp := importer.NewLegalholdExcelImporter().
-		WithClient(NewClient(ctx)).
+	imp := importer.NewExcelImporter().
+		WithClient(client).
 		WithExcel(ctx.String("excel")).
 		WithTimezone(tz).
 		WithMatterName(ctx.String("matterName")).
 		WithHoldName(ctx.String("holdName")).
+		Legalhold(). // convert to legalholdExcelImporter type
 		WithAttachmentDirectory(ctx.String("attachmentDirectory"))
 
 	err = imp.LoadLegalholdData()
@@ -264,15 +302,58 @@ func importLegalholds(ctx *cli.Context) error {
 		return err
 	}
 
-	if !ctx.Bool("skipInputCheck") {
-		err = imp.PerformDataIntegrityCheck()
-		if err != nil {
-			return err
-		}
+	err = imp.PerformDataIntegrityCheck()
+	if err != nil {
+		return err
+	}
 
-		if ctx.Bool("checkInputOnly") {
-			return nil
+	if ctx.Bool("checkInputOnly") {
+		return nil
+	}
+
+	err = imp.Import()
+	return err
+}
+
+func importSilentholds(ctx *cli.Context) error {
+	var err error
+
+	client := NewClient(ctx)
+
+	zip := ctx.String("zipfile")
+	if len(zip) > 0 {
+		if _, err := os.Stat(zip); err == nil || os.IsExist(err) {
+			if _, err = client.ImportSilenthold(zip); err != nil {
+				log.Error().Msgf("failed to import Silenthold from zip file: %s, %s", zip, err)
+				return err
+			}
 		}
+		return err
+	}
+
+	tz := otlh.GetTimezoneLocation(ctx.String("timezone"))
+	log.Debug().Msgf("timezone: %s", tz)
+
+	imp := importer.NewExcelImporter().
+		WithClient(NewClient(ctx)).
+		WithExcel(ctx.String("excel")).
+		WithTimezone(tz).
+		WithMatterName(ctx.String("matterName")).
+		WithHoldName(ctx.String("holdName")).
+		Silenthold()
+
+	err = imp.LoadSilentholdData()
+	if err != nil {
+		return err
+	}
+
+	err = imp.PerformDataIntegrityCheck()
+	if err != nil {
+		return err
+	}
+
+	if ctx.Bool("checkInputOnly") {
+		return nil
 	}
 
 	err = imp.Import()

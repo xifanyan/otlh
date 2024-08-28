@@ -15,73 +15,9 @@ var legalholdTemplateHeader = []string{"Folder Name", "Matter Name", "Hold Name"
 const INPUT_TIME_FORMAT = "1/2/06 3:04 PM"
 const OUTPUT_TIME_FORMAT = "01/02/2006 03:04 PM"
 
-type LegalholdEntry struct {
-	FolderName        string
-	MatterName        string
-	HoldName          string
-	HoldNoticeSubject string
-	HoldNoticeTitle   string
-	CustodianName     string
-	CustodianEmail    string
-	LastIssued        string
-	ResponseDate      string
-	ReleasedAt        string
-	LegalholdText     string
-	AttachmentNames   string
-}
-
-type LegalholdEntries []LegalholdEntry
-
-type Collections struct {
-	UnqiueFolderNames     map[string]int
-	UniqueMatterNames     map[string]int
-	UniqueCustodians      map[string]string
-	UniqueAttachmentNames map[string]struct{}
-	MatterToFolderMap     map[string]string
-	HoldDetailMap         map[string]LegalholdInfo
-	HoldToCustodiansMap   map[string][]CustodianDetail
-}
-
 type LegalholdExcelImporter struct {
-	excel               string
-	matterName          string
-	holdName            string
 	attachmentDirectory string
-	entries             LegalholdEntries
-	lineNnumberOfHeader int
-	collections         Collections
-	client              *otlh.Client
-	timezone            string
-}
-
-func NewLegalholdExcelImporter() *LegalholdExcelImporter {
-	return &LegalholdExcelImporter{
-		entries: LegalholdEntries{},
-		collections: Collections{
-			UnqiueFolderNames:     make(map[string]int),
-			UniqueMatterNames:     make(map[string]int),
-			UniqueCustodians:      make(map[string]string),
-			UniqueAttachmentNames: make(map[string]struct{}),
-			MatterToFolderMap:     make(map[string]string),
-			HoldDetailMap:         make(map[string]LegalholdInfo),
-			HoldToCustodiansMap:   make(map[string][]CustodianDetail),
-		},
-	}
-}
-
-func (imptr *LegalholdExcelImporter) WithClient(client *otlh.Client) *LegalholdExcelImporter {
-	imptr.client = client
-	return imptr
-}
-
-func (imptr *LegalholdExcelImporter) WithExcel(excel string) *LegalholdExcelImporter {
-	imptr.excel = excel
-	return imptr
-}
-
-func (imptr *LegalholdExcelImporter) WithTimezone(tz string) *LegalholdExcelImporter {
-	imptr.timezone = tz
-	return imptr
+	ExcelImporter
 }
 
 func (imptr *LegalholdExcelImporter) WithAttachmentDirectory(dir string) *LegalholdExcelImporter {
@@ -89,17 +25,7 @@ func (imptr *LegalholdExcelImporter) WithAttachmentDirectory(dir string) *Legalh
 	return imptr
 }
 
-func (imptr *LegalholdExcelImporter) WithMatterName(name string) *LegalholdExcelImporter {
-	imptr.matterName = name
-	return imptr
-}
-
-func (imptr *LegalholdExcelImporter) WithHoldName(name string) *LegalholdExcelImporter {
-	imptr.holdName = name
-	return imptr
-}
-
-func (imptr *LegalholdExcelImporter) collect(entry LegalholdEntry) {
+func (imptr *LegalholdExcelImporter) collect(entry HoldEntry) {
 	if _, ok := imptr.collections.UnqiueFolderNames[entry.FolderName]; !ok {
 		imptr.collections.UnqiueFolderNames[entry.FolderName] = 0
 	}
@@ -130,9 +56,9 @@ func (imptr *LegalholdExcelImporter) collect(entry LegalholdEntry) {
 		imptr.collections.HoldDetailMap[entry.MatterName+entry.HoldName] = LegalholdInfo{
 			MatterName:                entry.MatterName,
 			HoldName:                  entry.HoldName,
-			HoldNoticeSubject:         entry.HoldNoticeSubject,
-			HoldNoticeTitle:           entry.HoldNoticeTitle,
-			HoldNoticeBody:            entry.LegalholdText,
+			HoldNoticeSubject:         entry.Subject,
+			HoldNoticeTitle:           entry.Title,
+			HoldNoticeBody:            entry.Body,
 			HoldNoticeAttachmentNames: entry.AttachmentNames,
 		}
 	}
@@ -182,19 +108,19 @@ func (imptr *LegalholdExcelImporter) LoadLegalholdData() error {
 				data[i] = strings.TrimSpace(data[i])
 			}
 
-			entry := LegalholdEntry{
-				FolderName:        data[0],
-				MatterName:        data[1],
-				HoldName:          data[2],
-				HoldNoticeSubject: data[3],
-				HoldNoticeTitle:   data[4],
-				CustodianName:     data[5],
-				CustodianEmail:    data[6],
-				LastIssued:        data[7],
-				ResponseDate:      data[8],
-				ReleasedAt:        data[9],
-				LegalholdText:     data[10],
-				AttachmentNames:   data[11],
+			entry := HoldEntry{
+				FolderName:      data[0],
+				MatterName:      data[1],
+				HoldName:        data[2],
+				Subject:         data[3],
+				Title:           data[4],
+				CustodianName:   data[5],
+				CustodianEmail:  data[6],
+				LastIssued:      data[7],
+				ResponseDate:    data[8],
+				ReleasedAt:      data[9],
+				Body:            data[10],
+				AttachmentNames: data[11],
 			}
 
 			matterMatch := imptr.matterName == "" || imptr.matterName == entry.MatterName
@@ -221,47 +147,17 @@ func (imptr *LegalholdExcelImporter) LoadLegalholdData() error {
 func (imptr *LegalholdExcelImporter) transformToLegalholdDetails() (LegalholdDetails, error) {
 	var legalholdDetails LegalholdDetails = []LegalholdDetail{}
 
-	for _, holdDetail := range imptr.collections.HoldDetailMap {
+	for _, hold := range imptr.collections.HoldDetailMap {
+		holdInfo := hold.(LegalholdInfo)
 		legalholdDetail := LegalholdDetail{
-			FolderName:       imptr.collections.MatterToFolderMap[holdDetail.MatterName],
-			LegalholdInfo:    holdDetail,
-			CustodianDetails: imptr.collections.HoldToCustodiansMap[holdDetail.MatterName+holdDetail.HoldName],
+			FolderName:       imptr.collections.MatterToFolderMap[holdInfo.MatterName],
+			LegalholdInfo:    holdInfo,
+			CustodianDetails: imptr.collections.HoldToCustodiansMap[holdInfo.MatterName+holdInfo.HoldName],
 		}
 		legalholdDetails = append(legalholdDetails, legalholdDetail)
 	}
 
 	return legalholdDetails, nil
-}
-
-func (imptr *LegalholdExcelImporter) GetFolderID(name string) (int, error) {
-	var err error
-	var folder otlh.Folder
-
-	folderID := imptr.collections.UnqiueFolderNames[name]
-	if folderID > 0 {
-		return folderID, nil
-	}
-
-	if folder, err = imptr.client.FindOrCreateFolder(name); err != nil {
-		return 0, err
-	}
-	return folder.ID, nil
-}
-
-func (imptr *LegalholdExcelImporter) GetMatterID(name string) (int, error) {
-	var err error
-	var matter otlh.Matter
-	var folderID int
-
-	if folderID, err = imptr.GetFolderID(imptr.collections.MatterToFolderMap[name]); err != nil {
-		return 0, err
-	}
-
-	if matter, err = imptr.client.FindOrCreateMatter(name, folderID); err != nil {
-		return 0, err
-	}
-
-	return matter.ID, nil
 }
 
 func (imptr *LegalholdExcelImporter) Import() error {
@@ -283,7 +179,7 @@ func (imptr *LegalholdExcelImporter) Import() error {
 			len(legalholdDetail.CustodianDetails),
 		)
 
-		if matterID, err = imptr.GetMatterID(legalholdDetail.LegalholdInfo.MatterName); err != nil {
+		if matterID, err = imptr.getMatterID(legalholdDetail.LegalholdInfo.MatterName); err != nil {
 			log.Error().Msgf("[%s - %s] not able to get matter id", legalholdDetail.LegalholdInfo.MatterName, legalholdDetail.LegalholdInfo.HoldName)
 			continue
 		}
