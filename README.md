@@ -72,7 +72,7 @@ GLOBAL OPTIONS:
 }
 ```
 
-### Import Legalholds (silentholds)
+### Import Legalholds (Silentholds)
 ```
 NAME:
    otlh import legalholds
@@ -86,7 +86,7 @@ CATEGORY:
 OPTIONS:
    --attachmentDirectory value, --ad value  attachment directory (default: ".")
    --excel value, -e value                  excel file used for legalhold import
-   --zipfile value, -z value                zipfile
+   --zipfile value, -z value                zip package for importing holds e.g., legal_hold_details.zip
    --timezone value, --tz value             timezone for dates used in input file, supproted timezones: PST|EST|MST|CST (default: "UTC")
    --holdName value, --hn value             hold name
    --matterName value, --mn value           matter name
@@ -109,9 +109,9 @@ OPTIONS:
 ./otlh.exe --tenant test --authToken [*****] import legalholds --timezone=PST --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments
 ```
 
-- Debug mode
+- Trace mode
 ```
-./otlh.exe --debug --tenant test --authToken [*****] import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments
+./otlh.exe --trace --tenant test --authToken [*****] import legalholds --excel=../testdata/sample.xlsx --attachmentDirectory=../testdata/attachments
 ```
 
 - Partially import legalholds from excel file based on matter or hold names
