@@ -72,7 +72,42 @@ GLOBAL OPTIONS:
 }
 ```
 
-### Import Legalholds (Silentholds)
+### get
+```
+NAME:
+   otlh get
+
+USAGE:
+   otlh get command [command options]
+
+COMMANDS:
+   help, h  Shows a list of commands or help for one command
+   get:
+     custodians
+     folders
+     groups
+     matters
+     legalholds
+     silentholds
+
+OPTIONS:
+   --help, -h  show help
+```
+#### Examples
+optins --filterName, --filterTerm, --pageSize, --pageNumber, --sort, --id apply to all get commands
+
+- Get custodians with name filter
+```
+./otlh.exe get custodians --filterName paul
+```
+
+- Get custodians with pagination
+```
+./otlh.exe get custodians --pageSize 2 --pageNumber 2
+```
+
+### Import Legalholds/Silentholds
+All of the options (except --attachmentDirectory) apply to Silenthold import as well
 ```
 NAME:
    otlh import legalholds
