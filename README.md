@@ -96,6 +96,11 @@ OPTIONS:
 #### Examples
 optins --filterName, --filterTerm, --pageSize, --pageNumber, --sort, --id apply to all get commands
 
+- Get custodian with specific id
+```
+./otlh.exe get custodians --id 100000383
+```
+
 - Get custodians with name filter
 ```
 ./otlh.exe get custodians --filterName paul
