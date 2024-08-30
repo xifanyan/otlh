@@ -72,7 +72,7 @@ GLOBAL OPTIONS:
 }
 ```
 
-### get
+### Get - list otlh entities
 ```
 NAME:
    otlh get
