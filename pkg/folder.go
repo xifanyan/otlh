@@ -52,15 +52,7 @@ type Folder struct {
 type Folders []Folder
 
 type FoldersResponse struct {
-	Links struct {
-		Self struct {
-			Href string `json:"href"`
-		} `json:"self"`
-	} `json:"_links"`
-	Page struct {
-		HasMore    bool `json:"has-more"`
-		TotalCount int  `json:"total-count"`
-	} `json:"page"`
+	DefaultEntityListInfo
 	Embedded struct {
 		Folders []Folder `json:"folders"`
 	} `json:"_embedded"`

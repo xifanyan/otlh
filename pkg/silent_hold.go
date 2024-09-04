@@ -56,15 +56,7 @@ type Silenthold struct {
 type Silentholds []Silenthold
 
 type SilentholdsResponse struct {
-	Links struct {
-		Self struct {
-			Href string `json:"href"`
-		} `json:"self"`
-	} `json:"_links"`
-	Page struct {
-		HasMore    bool `json:"has-more"`
-		TotalCount int  `json:"total-count"`
-	} `json:"page"`
+	DefaultEntityListInfo
 	Embedded struct {
 		Silentholds Silentholds `json:"silent_holds"`
 	} `json:"_embedded"`

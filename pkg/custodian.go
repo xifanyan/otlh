@@ -48,15 +48,7 @@ type Custodian struct {
 type Custodians []Custodian
 
 type CustodiansResponse struct {
-	Links struct {
-		Self struct {
-			Href string `json:"href"`
-		} `json:"self"`
-	} `json:"_links"`
-	Page struct {
-		HasMore    bool `json:"has-more"`
-		TotalCount int  `json:"total-count"`
-	} `json:"page"`
+	DefaultEntityListInfo
 	Embedded struct {
 		Custodians Custodians `json:"custodians"`
 	} `json:"_embedded"`

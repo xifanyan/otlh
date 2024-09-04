@@ -49,15 +49,7 @@ type Legalhold struct {
 type Legalholds []Legalhold
 
 type LegalholdsResponse struct {
-	Links struct {
-		Self struct {
-			Href string `json:"href"`
-		} `json:"self"`
-	} `json:"_links"`
-	Page struct {
-		HasMore    bool `json:"has-more"`
-		TotalCount int  `json:"total-count"`
-	} `json:"page"`
+	DefaultEntityListInfo
 	Embedded struct {
 		Legalholds Legalholds `json:"legal_holds"`
 	} `json:"_embedded"`
