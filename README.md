@@ -94,16 +94,21 @@ OPTIONS:
    --help, -h  show help
 ```
 #### Examples
-optins --filterName, --filterTerm, --pageSize, --pageNumber, --sort, --id apply to all get commands
+optins [--filterName, --filterTerm, --pageSize, --pageNumber, --sort, --id, --all] apply to all get commands
 
 - Get custodian with specific id
 ```
 ./otlh.exe get custodians --id 100000383
 ```
 
-- Get custodians with name filter
+- Get all custodians (without --all, output only includes first page of the custodians)
 ```
-./otlh.exe get custodians --filterName paul
+./otlh.exe get custodians --all
+```
+
+- Get all custodians with name filter (in case number of custodians exceeds default page size)
+```
+./otlh.exe get custodians --filterName john --all
 ```
 
 - Get custodians with pagination
