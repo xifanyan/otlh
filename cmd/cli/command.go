@@ -380,17 +380,16 @@ func getCustodians(ctx *cli.Context) error {
 	b := otlh.NewRequest().WithTenant(client.Tenant()).Get().Custodian()
 	opts := listOptions(ctx)
 
-	if ctx.Bool("all") {
-		client.PrintAllCustodians()
-		return nil
-	}
-
 	if ctx.Int("id") > 0 {
 		req, _ = b.WithID(ctx.Int("id")).Build()
 		v, err = client.GetCustodian(req)
 	} else {
 		req, _ = b.Build()
-		v, err = client.GetCustodians(req, opts)
+		if ctx.Bool("all") {
+			v, err = client.GetAllCustodians(req, opts)
+		} else {
+			v, err = client.GetCustodians(req, opts)
+		}
 	}
 
 	if err != nil {
@@ -420,8 +419,13 @@ func getFolders(ctx *cli.Context) error {
 		if ctx.Int("groupID") > 0 {
 			b.WithGroupID(ctx.Int("groupID"))
 		}
+
 		req, _ = b.Build()
-		v, err = client.GetFolders(req, opts)
+		if ctx.Bool("all") {
+			v, err = client.GetAllFolders(req, opts)
+		} else {
+			v, err = client.GetFolders(req, opts)
+		}
 	}
 
 	if err != nil {
@@ -448,7 +452,11 @@ func getGroups(ctx *cli.Context) error {
 		v, err = client.GetGroup(req)
 	} else {
 		req, _ = b.Build()
-		v, err = client.GetGroups(req, opts)
+		if ctx.Bool("all") {
+			v, err = client.GetAllGroups(req, opts)
+		} else {
+			v, err = client.GetGroups(req, opts)
+		}
 	}
 
 	if err != nil {
@@ -475,7 +483,11 @@ func getMatters(ctx *cli.Context) error {
 		v, err = client.GetMatter(req)
 	} else {
 		req, _ = b.Build()
-		v, err = client.GetMatters(req, opts)
+		if ctx.Bool("all") {
+			v, err = client.GetAllMatters(req, opts)
+		} else {
+			v, err = client.GetMatters(req, opts)
+		}
 	}
 
 	if err != nil {
@@ -502,7 +514,11 @@ func getLegalholds(ctx *cli.Context) error {
 		v, err = client.GetLegalhold(req)
 	} else {
 		req, _ = b.Build()
-		v, err = client.GetLegalholds(req, opts)
+		if ctx.Bool("all") {
+			v, err = client.GetAllLegalholds(req, opts)
+		} else {
+			v, err = client.GetLegalholds(req, opts)
+		}
 	}
 
 	if err != nil {
@@ -529,7 +545,11 @@ func getSilentholds(ctx *cli.Context) error {
 		v, err = client.GetSilenthold(req)
 	} else {
 		req, _ = b.Build()
-		v, err = client.GetSilentholds(req, opts)
+		if ctx.Bool("all") {
+			v, err = client.GetAllSilentholds(req, opts)
+		} else {
+			v, err = client.GetSilentholds(req, opts)
+		}
 	}
 
 	if err != nil {

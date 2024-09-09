@@ -1,1 +1,1 @@
-go build -o bin/otlh .
+go build -ldflags="-s -w" -o bin/otlh .

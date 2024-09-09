@@ -219,6 +219,10 @@ func (c *Client) GetCustodians(req Requestor, opts ...Options) (Custodians, erro
 	return resp.Embedded.Custodians, c.Do(req, &resp, opts...)
 }
 
+func (c *Client) GetAllCustodians(req Requestor, opts Options) (Custodians, error) {
+	return getAllEntities(c, req, opts, unmarshalCustodians)
+}
+
 func (c *Client) GetGroup(req Requestor) (Group, error) {
 	var group Group
 	return group, c.Do(req, &group)
@@ -227,6 +231,10 @@ func (c *Client) GetGroup(req Requestor) (Group, error) {
 func (c *Client) GetGroups(req Requestor, opts ...Options) (Groups, error) {
 	var resp GroupsResponse
 	return resp.Embedded.Groups, c.Do(req, &resp, opts...)
+}
+
+func (c *Client) GetAllGroups(req Requestor, opts Options) (Groups, error) {
+	return getAllEntities(c, req, opts, unmarshalGroups)
 }
 
 func (c *Client) GetFolder(req Requestor) (Folder, error) {
@@ -239,6 +247,10 @@ func (c *Client) GetFolders(req Requestor, opts ...Options) (Folders, error) {
 	return resp.Embedded.Folders, c.Do(req, &resp, opts...)
 }
 
+func (c *Client) GetAllFolders(req Requestor, opts Options) (Folders, error) {
+	return getAllEntities(c, req, opts, unmarshalFolders)
+}
+
 func (c *Client) GetMatter(req Requestor) (Matter, error) {
 	var matter Matter
 	return matter, c.Do(req, &matter)
@@ -247,6 +259,10 @@ func (c *Client) GetMatter(req Requestor) (Matter, error) {
 func (c *Client) GetMatters(req Requestor, opts ...Options) (Matters, error) {
 	var resp MattersResponse
 	return resp.Embedded.Matters, c.Do(req, &resp, opts...)
+}
+
+func (c *Client) GetAllMatters(req Requestor, opts Options) (Matters, error) {
+	return getAllEntities(c, req, opts, unmarshalMatters)
 }
 
 func (c *Client) GetLegalhold(req Requestor) (Legalhold, error) {
@@ -260,6 +276,10 @@ func (c *Client) GetLegalholds(req Requestor, opts ...Options) (Legalholds, erro
 	return resp.Embedded.Legalholds, err
 }
 
+func (c *Client) GetAllLegalholds(req Requestor, opts Options) (Legalholds, error) {
+	return getAllEntities(c, req, opts, unmarshalLegalholds)
+}
+
 func (c *Client) GetSilenthold(req Requestor) (Silenthold, error) {
 	var silenthold Silenthold
 	return silenthold, c.Do(req, &silenthold)
@@ -271,100 +291,8 @@ func (c *Client) GetSilentholds(req Requestor, opts ...Options) (Silentholds, er
 	return resp.Embedded.Silentholds, err
 }
 
-/**
- * GetAllCustodians retrieves all custodians from the API, paginating through results as needed.
- *
- * Parameters:
- * - req: the request to send to the API
- * - opts: options for the request
- *
- * Returns:
- * - custodiansChan: a channel that will receive all custodians
- * - errsChan: a channel that will receive any errors that occur
- */
-func (c *Client) GetAllCustodians(opts Options) (<-chan Custodian, <-chan error) {
-
-	var resp CustodiansResponse
-
-	custodiansChan := make(chan Custodian)
-	errsChan := make(chan error)
-
-	req, _ := NewRequest().WithTenant(c.tenant).Get().Custodian().Build()
-
-	go func() {
-		var v []byte
-		var err error
-
-		defer close(custodiansChan)
-		defer close(errsChan)
-
-		page := 1
-		for {
-			log.Debug().Msgf("GetAllCustodians: page %d", page)
-			opts.(*ListOptions).WithPageNumber(page)
-			if v, err = c.Send(req, opts); err != nil {
-				errsChan <- err
-				break
-			}
-
-			if err = json.Unmarshal(v, &resp); err != nil {
-				errsChan <- err
-				break
-			}
-
-			for _, custodian := range resp.Embedded.Custodians {
-				custodiansChan <- custodian
-			}
-
-			if !resp.Page.HasMore {
-				return
-			}
-			page++
-		}
-	}()
-
-	return custodiansChan, errsChan
-}
-
-func (c *Client) PrintAllCustodians() {
-
-	printer := NewPrinter().JSON().Build()
-
-	opts := NewListOptions().WithPageSize(100)
-
-	custodianCh, errCh := c.GetAllCustodians(opts)
-
-	fmt.Println("[")
-
-	isFirstElement := true
-	for {
-		select {
-		case custodian, ok := <-custodianCh:
-
-			if !ok {
-				custodianCh = nil
-			} else {
-				if !isFirstElement {
-					fmt.Println(",")
-				}
-				isFirstElement = false
-
-				printer.Print(custodian)
-			}
-		case err, ok := <-errCh:
-			if !ok {
-				errCh = nil
-			} else {
-				log.Error().Err(err)
-			}
-		}
-
-		if custodianCh == nil && errCh == nil {
-			break
-		}
-	}
-
-	fmt.Println("]")
+func (c *Client) GetAllSilentholds(req Requestor, opts Options) (Silentholds, error) {
+	return getAllEntities(c, req, opts, unmarshalSilentholds)
 }
 
 /**

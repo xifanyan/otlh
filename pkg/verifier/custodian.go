@@ -22,34 +22,22 @@ func (cv *CustodianVerifier) WithClient(client *otlh.Client) *CustodianVerifier 
 }
 
 func (cv *CustodianVerifier) LoadAllCustodiansFromOTLH() (map[string]struct{}, error) {
-	var custodians map[string]struct{} = make(map[string]struct{})
+	var custodianMap map[string]struct{} = make(map[string]struct{})
 
+	req, _ := otlh.NewRequest().WithTenant(cv.client.Tenant()).Get().Custodian().Build()
 	opts := otlh.NewListOptions().WithPageSize(100)
 
-	custodianCh, errCh := cv.client.GetAllCustodians(opts)
-	for {
-		select {
-		case custodian, ok := <-custodianCh:
-			if !ok {
-				custodianCh = nil
-			} else {
-				custodians[custodian.Email] = struct{}{}
-			}
-		case err, ok := <-errCh:
-			if !ok {
-				errCh = nil
-			} else {
-				log.Error().Err(err)
-			}
-		}
-
-		if custodianCh == nil && errCh == nil {
-			break
-		}
+	custodians, err := cv.client.GetAllCustodians(req, opts)
+	if err != nil {
+		return nil, err
 	}
 
-	log.Debug().Msgf("Loaded %d custodians", len(custodians))
-	return custodians, nil
+	for _, custodian := range custodians {
+		custodianMap[custodian.Email] = struct{}{}
+	}
+
+	log.Debug().Msgf("Loaded %d custodians", len(custodianMap))
+	return custodianMap, nil
 }
 
 type CustodianInput struct {

@@ -45,14 +45,14 @@ type Custodian struct {
 	} `json:"_links,omitempty" csv:"-"`
 }
 
-type Custodians []Custodian
-
 type CustodiansResponse struct {
 	DefaultEntityListInfo
 	Embedded struct {
-		Custodians Custodians `json:"custodians"`
+		Custodians []Custodian `json:"custodians"`
 	} `json:"_embedded"`
 }
+
+type Custodians []Custodian
 
 type CustodianRequestBuilder struct {
 	*CustodianRequest
