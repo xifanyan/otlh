@@ -7,17 +7,17 @@ Custodian represents a custodian record in the system. It contains identifying
 information about the custodian as well as metadata about their status.
 */
 type Custodian struct {
-	ID                      int    `json:"id" csv:"id"`
+	ID                      int    `json:"id" csv:"-"`
 	Name                    string `json:"name" csv:"name"`
 	Email                   string `json:"email" csv:"email"`
-	Synced                  bool   `json:"synced,omitempty" csv:"synced"`
+	Synced                  bool   `json:"synced,omitempty" csv:"-"`
 	Phone                   string `json:"phone,omitempty" csv:"phone"`
 	Notes                   string `json:"notes,omitempty" csv:"notes"`
 	Title                   string `json:"title,omitempty" csv:"title"`
 	EmployeeID              string `json:"employee_id,omitempty" csv:"employee_id"`
 	EmployeeType            string `json:"employee_type,omitempty" csv:"employee_type"`
 	EmployeeStatus          string `json:"employee_status,omitempty" csv:"employee_status"`
-	EmployeeStatusChangedAt string `json:"employee_status_changed_at,omitempty" csv:"employee_status_changed_at"`
+	EmployeeStatusChangedAt string `json:"employee_status_changed_at,omitempty" csv:"-"`
 	Department              string `json:"department,omitempty" csv:"depoartment"`
 	Location                string `json:"location,omitempty" csv:"location"`
 	SupervisorEmail         string `json:"supervisor_email,omitempty" csv:"supervisor_email"`
@@ -27,8 +27,8 @@ type Custodian struct {
 	Country                 string `json:"country,omitempty" csv:"country"`
 	DelegateEmail           string `json:"delegate_email,omitempty" csv:"delegate_email"`
 	DelegateName            string `json:"delegate_name,omitempty" csv:"delegate_name"`
-	CreatedAt               string `json:"created_at,omitempty" csv:"created_at"`
-	UpdatedAt               string `json:"updated_at,omitempty" csv:"updated_at"`
+	CreatedAt               string `json:"created_at,omitempty" csv:"-"`
+	UpdatedAt               string `json:"updated_at,omitempty" csv:"-"`
 	Links                   struct {
 		Self struct {
 			Href string `json:"href,omitempty" csv:"-"`
