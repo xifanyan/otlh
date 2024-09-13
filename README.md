@@ -36,7 +36,7 @@ USAGE:
    otlh [global options] command [command options]
 
 VERSION:
-   0.4.0-beta
+   0.4.2-beta
 
 COMMANDS:
    create
@@ -84,6 +84,7 @@ COMMANDS:
    help, h  Shows a list of commands or help for one command
    get:
      custodians
+     custodian_groups
      folders
      groups
      matters
