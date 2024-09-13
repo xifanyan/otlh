@@ -223,6 +223,20 @@ func (c *Client) GetAllCustodians(req Requestor, opts Options) (Custodians, erro
 	return getAllEntities(c, req, opts, unmarshalCustodians)
 }
 
+func (c *Client) GetCustodianGroup(req Requestor) (CustodianGroup, error) {
+	var custodianGroup CustodianGroup
+	return custodianGroup, c.Do(req, &custodianGroup)
+}
+
+func (c *Client) GetCustodianGroups(req Requestor, opts ...Options) (CustodianGroups, error) {
+	var resp CustodianGroupsResponse
+	return resp.Embedded.CustodianGroups, c.Do(req, &resp, opts...)
+}
+
+func (c *Client) GetAllCustodianGroups(req Requestor, opts Options) (CustodianGroups, error) {
+	return getAllEntities(c, req, opts, unmarshalCustodianGroups)
+}
+
 func (c *Client) GetGroup(req Requestor) (Group, error) {
 	var group Group
 	return group, c.Do(req, &group)

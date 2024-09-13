@@ -45,6 +45,9 @@ func (req *Request) Custodian() *CustodianRequestBuilder {
 	return &CustodianRequestBuilder{CustodianRequest: &CustodianRequest{Request: *req}}
 }
 
+func (req *Request) CustodianGroup() *CustodianGroupRequestBuilder {
+	return &CustodianGroupRequestBuilder{CustodianGroupRequest: &CustodianGroupRequest{Request: *req}}
+}
 func (req *Request) Legalhold() *LegalholdRequestBuilder {
 	return &LegalholdRequestBuilder{LegalholdRequest: &LegalholdRequest{Request: *req}}
 }

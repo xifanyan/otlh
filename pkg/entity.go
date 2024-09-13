@@ -51,6 +51,12 @@ func unmarshalCustodians(data []byte) ([]Custodian, bool, error) {
 	return resp.Embedded.Custodians, resp.Page.HasMore, err
 }
 
+func unmarshalCustodianGroups(data []byte) ([]CustodianGroup, bool, error) {
+	var resp CustodianGroupsResponse
+	err := json.Unmarshal(data, &resp)
+	return resp.Embedded.CustodianGroups, resp.Page.HasMore, err
+}
+
 func unmarshalGroups(data []byte) ([]Group, bool, error) {
 	var resp GroupsResponse
 	err := json.Unmarshal(data, &resp)

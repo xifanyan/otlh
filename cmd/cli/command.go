@@ -48,6 +48,7 @@ var (
 		Name: "get",
 		Subcommands: []*cli.Command{
 			GetCustodiansCmd,
+			GetCustodianGroupsCmd,
 			GetFoldersCmd,
 			GetGroupsCmd,
 			GetMattersCmd,
@@ -117,6 +118,13 @@ var (
 
 	GetCustodiansCmd = &cli.Command{
 		Name:     "custodians",
+		Category: "get",
+		Action:   execute,
+		Flags:    DefaultListOptions,
+	}
+
+	GetCustodianGroupsCmd = &cli.Command{
+		Name:     "custodian_groups",
 		Category: "get",
 		Action:   execute,
 		Flags:    DefaultListOptions,
@@ -222,6 +230,8 @@ func execute(ctx *cli.Context) error {
 		switch ctx.Command.Name {
 		case "custodians":
 			return getCustodians(ctx)
+		case "custodian_groups":
+			return getCustodianGroups(ctx)
 		case "folders":
 			return getFolders(ctx)
 		case "matters":
@@ -389,6 +399,38 @@ func getCustodians(ctx *cli.Context) error {
 			v, err = client.GetAllCustodians(req, opts)
 		} else {
 			v, err = client.GetCustodians(req, opts)
+		}
+	}
+
+	if err != nil {
+		return err
+	}
+
+	printer := otlh.NewPrinter().JSON().Build()
+	printer.Print(v)
+	return nil
+}
+
+func getCustodianGroups(ctx *cli.Context) error {
+	var err error
+	var v any
+
+	var req otlh.Requestor
+
+	client := NewClient(ctx)
+
+	b := otlh.NewRequest().WithTenant(client.Tenant()).Get().CustodianGroup()
+	opts := listOptions(ctx)
+
+	if ctx.Int("id") > 0 {
+		req, _ = b.WithID(ctx.Int("id")).Build()
+		v, err = client.GetCustodianGroup(req)
+	} else {
+		req, _ = b.Build()
+		if ctx.Bool("all") {
+			v, err = client.GetAllCustodianGroups(req, opts)
+		} else {
+			v, err = client.GetCustodianGroups(req, opts)
 		}
 	}
 
