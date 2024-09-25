@@ -43,12 +43,18 @@ type CustodianGroupRequestBuilder struct {
 }
 
 type CustodianGroupRequest struct {
-	id int
+	id          int
+	custodianID int
 	Request
 }
 
 func (b *CustodianGroupRequestBuilder) WithID(id int) *CustodianGroupRequestBuilder {
 	b.id = id
+	return b
+}
+
+func (b *CustodianGroupRequestBuilder) WithCustodianID(id int) *CustodianGroupRequestBuilder {
+	b.custodianID = id
 	return b
 }
 
@@ -58,6 +64,10 @@ func (b *CustodianGroupRequestBuilder) Build() (*CustodianGroupRequest, error) {
 
 func (req *CustodianGroupRequest) Endpoint() string {
 	if req.id == 0 {
+		if req.custodianID > 0 {
+			// retrieves custodians under a custodian group: /t/{tenant}/api/{version}/custodian_groups/{id}/custodians
+			return fmt.Sprintf("/t/%s/api/%s/custodians/%d/custodian_groups", req.tenant, APIVERSION, req.custodianID)
+		}
 		return fmt.Sprintf("/t/%s/api/%s/custodian_groups", req.tenant, APIVERSION)
 	}
 	return fmt.Sprintf("/t/%s/api/%s/custodian_groups/%d", req.tenant, APIVERSION, req.id)

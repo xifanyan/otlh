@@ -120,14 +120,21 @@ var (
 		Name:     "custodians",
 		Category: "get",
 		Action:   execute,
-		Flags:    DefaultListOptions,
+		Flags: append(DefaultListOptions,
+			MatterID,
+			LegalHoldID,
+			SilentHoldID,
+			CustodianGroupID,
+		),
 	}
 
 	GetCustodianGroupsCmd = &cli.Command{
 		Name:     "custodian_groups",
 		Category: "get",
 		Action:   execute,
-		Flags:    DefaultListOptions,
+		Flags: append(DefaultListOptions,
+			CustodianID,
+		),
 	}
 
 	GetFoldersCmd = &cli.Command{
@@ -380,21 +387,38 @@ func listOptions(ctx *cli.Context) *otlh.ListOptions {
 }
 
 func getCustodians(ctx *cli.Context) error {
+	client := NewClient(ctx)
+	opts := listOptions(ctx)
+
+	var req otlh.Requestor
 	var err error
 	var v any
 
-	var req otlh.Requestor
-
-	client := NewClient(ctx)
-
+	// Build the request
 	b := otlh.NewRequest().WithTenant(client.Tenant()).Get().Custodian()
-	opts := listOptions(ctx)
-
 	if ctx.Int("id") > 0 {
-		req, _ = b.WithID(ctx.Int("id")).Build()
+		b = b.WithID(ctx.Int("id"))
+	} else {
+		if ctx.Int("matterID") > 0 {
+			b = b.WithMatterID(ctx.Int("matterID"))
+		}
+		if ctx.Int("legalHoldID") > 0 {
+			b = b.WithLegalHoldID(ctx.Int("legalHoldID"))
+		}
+		if ctx.Int("silentHoldID") > 0 {
+			b = b.WithSilentHoldID(ctx.Int("silentHoldID"))
+		}
+		if ctx.Int("custodianGroupID") > 0 {
+			b = b.WithCustodianGroupID(ctx.Int("custodianGroupID"))
+		}
+	}
+
+	req, _ = b.Build()
+
+	// Fetch custodians
+	if ctx.Int("id") > 0 {
 		v, err = client.GetCustodian(req)
 	} else {
-		req, _ = b.Build()
 		if ctx.Bool("all") {
 			v, err = client.GetAllCustodians(req, opts)
 		} else {
@@ -402,6 +426,7 @@ func getCustodians(ctx *cli.Context) error {
 		}
 	}
 
+	// Handle error and print result
 	if err != nil {
 		return err
 	}
@@ -412,21 +437,26 @@ func getCustodians(ctx *cli.Context) error {
 }
 
 func getCustodianGroups(ctx *cli.Context) error {
-	var err error
-	var v any
-
-	var req otlh.Requestor
-
 	client := NewClient(ctx)
-
-	b := otlh.NewRequest().WithTenant(client.Tenant()).Get().CustodianGroup()
 	opts := listOptions(ctx)
 
+	var err error
+	var v any
+	var req otlh.Requestor
+
+	b := otlh.NewRequest().WithTenant(client.Tenant()).Get().CustodianGroup()
 	if ctx.Int("id") > 0 {
-		req, _ = b.WithID(ctx.Int("id")).Build()
+		b = b.WithID(ctx.Int("id"))
+	} else {
+		if ctx.Int("custodianID") > 0 {
+			b = b.WithCustodianID(ctx.Int("custodianID"))
+		}
+	}
+	req, _ = b.Build()
+
+	if ctx.Int("id") > 0 {
 		v, err = client.GetCustodianGroup(req)
 	} else {
-		req, _ = b.Build()
 		if ctx.Bool("all") {
 			v, err = client.GetAllCustodianGroups(req, opts)
 		} else {

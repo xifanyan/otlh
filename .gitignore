@@ -9,7 +9,9 @@
 Desktop.ini
 
 # Thumbnail cache files
+.otlh.json
 ._*
 Thumbs.db
 
 bin/
+testdata/

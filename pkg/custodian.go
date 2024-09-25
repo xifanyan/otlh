@@ -59,11 +59,11 @@ type CustodianRequestBuilder struct {
 }
 
 type CustodianRequest struct {
-	id                int
-	matterID          int
-	legalHoldID       int
-	silentHoldID      int
-	custodianGroupsID int
+	id               int
+	matterID         int
+	legalHoldID      int
+	silentHoldID     int
+	custodianGroupID int
 	Request
 }
 
@@ -82,8 +82,8 @@ func (b *CustodianRequestBuilder) WithLegalHoldID(id int) *CustodianRequestBuild
 	return b
 }
 
-func (b *CustodianRequestBuilder) WithCustodianGroupsID(id int) *CustodianRequestBuilder {
-	b.custodianGroupsID = id
+func (b *CustodianRequestBuilder) WithCustodianGroupID(id int) *CustodianRequestBuilder {
+	b.custodianGroupID = id
 	return b
 }
 
@@ -108,14 +108,14 @@ func (req *CustodianRequest) Endpoint() string {
 			return fmt.Sprintf("/t/%s/api/%s/legal_holds/%d/custodians", req.tenant, APIVERSION, req.legalHoldID)
 		}
 
-		if req.custodianGroupsID > 0 {
-			// retrieves custodians under a custodian group: /t/{tenant}/api/{version}/custodian_groups/{id}/custodians
-			return fmt.Sprintf("/t/%s/api/%s/custodian_groups/%d/custodians", req.tenant, APIVERSION, req.custodianGroupsID)
-		}
-
 		if req.silentHoldID > 0 {
 			// retrieves custodians under a silent hold: /t/{tenant}/api/{version}/silent_holds/{id}/custodians
 			return fmt.Sprintf("/t/%s/api/%s/silent_holds/%d/custodians", req.tenant, APIVERSION, req.silentHoldID)
+		}
+
+		if req.custodianGroupID > 0 {
+			// retrieves custodians under a custodian group: /t/{tenant}/api/{version}/custodian_groups/{id}/custodians
+			return fmt.Sprintf("/t/%s/api/%s/custodian_groups/%d/custodians", req.tenant, APIVERSION, req.custodianGroupID)
 		}
 
 		// list all custodians: /t/{tenant}/api/{version}/custodians

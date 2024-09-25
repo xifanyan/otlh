@@ -39,6 +39,31 @@ var (
 		Usage: "group id",
 	}
 
+	CustodianID = &cli.IntFlag{
+		Name:  "custodianID",
+		Usage: "custodian id",
+	}
+
+	LegalHoldID = &cli.IntFlag{
+		Name:  "legalHoldID",
+		Usage: "legalhold id",
+	}
+
+	SilentHoldID = &cli.IntFlag{
+		Name:  "silentHoldID",
+		Usage: "silenthold id",
+	}
+
+	CustodianGroupID = &cli.IntFlag{
+		Name:  "custodianGroupID",
+		Usage: "custodian group id",
+	}
+
+	MatterID = &cli.IntFlag{
+		Name:  "matterID",
+		Usage: "matter id",
+	}
+
 	MatterName = &cli.StringFlag{
 		Name:    "matterName",
 		Aliases: []string{"mn"},
