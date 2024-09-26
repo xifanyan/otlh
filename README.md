@@ -36,7 +36,7 @@ USAGE:
    otlh [global options] command [command options]
 
 VERSION:
-   0.4.2-beta
+   0.5.0-beta
 
 COMMANDS:
    create
@@ -99,22 +99,22 @@ optins [--filterName, --filterTerm, --pageSize, --pageNumber, --sort, --id, --al
 
 - Get custodian with specific id
 ```
-./otlh.exe get custodians --id 100000383
+./otlh.exe --tenant ps_test --authToken *** get custodians --id 100000383
 ```
 
 - Get all custodians (without --all, output only includes first page of the custodians)
 ```
-./otlh.exe get custodians --all
+./otlh.exe --tenant ps_test --authToken *** get custodians --all
 ```
 
 - Get all custodians with name filter (in case number of custodians exceeds default page size)
 ```
-./otlh.exe get custodians --filterName john --all
+./otlh.exe --tenant ps_test --authToken *** get custodians --filterName john --all
 ```
 
 - Get custodians with pagination
 ```
-./otlh.exe get custodians --pageSize 2 --pageNumber 2
+./otlh.exe --tenant ps_test --authToken *** get custodians --pageSize 2 --pageNumber 2
 ```
 
 ### Import Legalholds/Silentholds
