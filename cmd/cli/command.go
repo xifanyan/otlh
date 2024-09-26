@@ -267,7 +267,7 @@ func NewClient(ctx *cli.Context) *otlh.Client {
 	if configPath != "" {
 		cfg, err = loadConfig(configPath)
 		if err != nil {
-			log.Warn().Err(err).Msg("failed to load config")
+			log.Fatal().Err(err).Msg("failed to load config")
 		}
 	}
 
