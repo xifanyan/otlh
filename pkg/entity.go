@@ -2,6 +2,9 @@ package otlh
 
 import (
 	"encoding/json"
+	"time"
+
+	"github.com/schollz/progressbar/v3"
 )
 
 type DefaultEntityListInfo struct {
@@ -16,9 +19,11 @@ type DefaultEntityListInfo struct {
 	} `json:"page"`
 }
 
-func getAllEntities[T any](c *Client, req Requestor, opts Options, unmarshal func([]byte) ([]T, bool, error)) ([]T, error) {
+func getAllEntities[T any](c *Client, req Requestor, opts Options, unmarshal func([]byte) ([]T, bool, int, error)) ([]T, error) {
 	var entities []T
 	var page int = 1
+
+	bar := progressbar.Default(100)
 
 	for {
 		opts.(*ListOptions).WithPageNumber(page)
@@ -28,13 +33,16 @@ func getAllEntities[T any](c *Client, req Requestor, opts Options, unmarshal fun
 			return nil, err
 		}
 
-		pageEntities, hasMore, err := unmarshal(resp)
+		pageEntities, hasMore, totalCount, err := unmarshal(resp)
 		if err != nil {
 			return nil, err
 		}
 
-		entities = append(entities, pageEntities...)
+		bar.ChangeMax(totalCount)
+		bar.Add(opts.(*ListOptions).pageSize)
+		time.Sleep(5 * time.Millisecond)
 
+		entities = append(entities, pageEntities...)
 		if !hasMore {
 			break
 		}
@@ -45,44 +53,44 @@ func getAllEntities[T any](c *Client, req Requestor, opts Options, unmarshal fun
 	return entities, nil
 }
 
-func unmarshalCustodians(data []byte) ([]Custodian, bool, error) {
+func unmarshalCustodians(data []byte) ([]Custodian, bool, int, error) {
 	var resp CustodiansResponse
 	err := json.Unmarshal(data, &resp)
-	return resp.Embedded.Custodians, resp.Page.HasMore, err
+	return resp.Embedded.Custodians, resp.Page.HasMore, resp.Page.TotalCount, err
 }
 
-func unmarshalCustodianGroups(data []byte) ([]CustodianGroup, bool, error) {
+func unmarshalCustodianGroups(data []byte) ([]CustodianGroup, bool, int, error) {
 	var resp CustodianGroupsResponse
 	err := json.Unmarshal(data, &resp)
-	return resp.Embedded.CustodianGroups, resp.Page.HasMore, err
+	return resp.Embedded.CustodianGroups, resp.Page.HasMore, resp.Page.TotalCount, err
 }
 
-func unmarshalGroups(data []byte) ([]Group, bool, error) {
+func unmarshalGroups(data []byte) ([]Group, bool, int, error) {
 	var resp GroupsResponse
 	err := json.Unmarshal(data, &resp)
-	return resp.Embedded.Groups, resp.Page.HasMore, err
+	return resp.Embedded.Groups, resp.Page.HasMore, resp.Page.TotalCount, err
 }
 
-func unmarshalFolders(data []byte) ([]Folder, bool, error) {
+func unmarshalFolders(data []byte) ([]Folder, bool, int, error) {
 	var resp FoldersResponse
 	err := json.Unmarshal(data, &resp)
-	return resp.Embedded.Folders, resp.Page.HasMore, err
+	return resp.Embedded.Folders, resp.Page.HasMore, resp.Page.TotalCount, err
 }
 
-func unmarshalMatters(data []byte) ([]Matter, bool, error) {
+func unmarshalMatters(data []byte) ([]Matter, bool, int, error) {
 	var resp MattersResponse
 	err := json.Unmarshal(data, &resp)
-	return resp.Embedded.Matters, resp.Page.HasMore, err
+	return resp.Embedded.Matters, resp.Page.HasMore, resp.Page.TotalCount, err
 }
 
-func unmarshalLegalholds(data []byte) ([]Legalhold, bool, error) {
+func unmarshalLegalholds(data []byte) ([]Legalhold, bool, int, error) {
 	var resp LegalholdsResponse
 	err := json.Unmarshal(data, &resp)
-	return resp.Embedded.Legalholds, resp.Page.HasMore, err
+	return resp.Embedded.Legalholds, resp.Page.HasMore, resp.Page.TotalCount, err
 }
 
-func unmarshalSilentholds(data []byte) ([]Silenthold, bool, error) {
+func unmarshalSilentholds(data []byte) ([]Silenthold, bool, int, error) {
 	var resp SilentholdsResponse
 	err := json.Unmarshal(data, &resp)
-	return resp.Embedded.Silentholds, resp.Page.HasMore, err
+	return resp.Embedded.Silentholds, resp.Page.HasMore, resp.Page.TotalCount, err
 }
