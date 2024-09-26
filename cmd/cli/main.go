@@ -49,7 +49,7 @@ func main() {
 				Aliases: []string{"c"},
 				Usage:   "LHN json config file",
 				EnvVars: []string{"LHN_CONFIG"},
-				Value:   ".otlh.json",
+				Value:   "",
 			},
 			&cli.BoolFlag{
 				Name:    "debug",

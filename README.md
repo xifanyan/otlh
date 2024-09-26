@@ -50,7 +50,7 @@ GLOBAL OPTIONS:
    --port value, -p value       port (default: 443)
    --tenant value, -t value     tenant name [%LHN_TENANT%]
    --authToken value, -a value  token to access legalhold web service [%LHN_AUTHTOKEN%]
-   --config value, -c value     LHN json config file (default: ".otlh.json") [%LHN_CONFIG%]
+   --config value, -c value     LHN json config file [%LHN_CONFIG%]
    --debug, -d                  Debug Mode (default: false)
    --trace, -z                  Trace Mode (default: false)
    --help, -h                   show help
@@ -62,12 +62,12 @@ GLOBAL OPTIONS:
 - port defaults to 443
 - tenant is mandatory and can be specified in the config file or via environment variable LHN_TENANT.
 - authToken is mandatory and can be specified in the config file or via environment variable LHN_AUTHTOKEN.
-- config file is optional and can be specified via environment variable LHN_CONFIG, it defaults to .otlh.json with following format:
+- config file is optional and can be specified via environment variable LHN_CONFIG with format:
 ```
 {
     "domain": "api.otlegalhold.com",
     "port": 443,
-    "tenant": "test",
+    "tenant": "demo",
     "authToken": "*************************"
 }
 ```

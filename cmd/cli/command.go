@@ -260,30 +260,33 @@ func execute(ctx *cli.Context) error {
 }
 
 func NewClient(ctx *cli.Context) *otlh.Client {
+	var cfg *ClientConfig
+	var err error
 
-	if _, err := os.Stat(ctx.String("config")); os.IsNotExist(err) {
-		log.Debug().Msgf("config file not found: %s, use command args", ctx.String("config"))
-		return otlh.NewClientBuilder().
-			WithDomain(ctx.String("domain")).
-			WithPort(ctx.Int("port")).
-			WithTenant(ctx.String("tenant")).
-			WithAuthToken(ctx.String("authToken")).
-			Build()
+	configPath := ctx.String("config")
+	if configPath != "" {
+		cfg, err = loadConfig(configPath)
+		if err != nil {
+			log.Warn().Err(err).Msg("failed to load config")
+		}
 	}
 
-	log.Debug().Msgf("use config file: %s", ctx.String("config"))
-	cfg, err := loadConfig(ctx.String("config"))
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to load config")
+	if cfg == nil {
+		cfg = &ClientConfig{
+			Domain:    ctx.String("domain"),
+			Port:      ctx.Int("port"),
+			Tenant:    ctx.String("tenant"),
+			AuthToken: ctx.String("authToken"),
+		}
 	}
 
+	log.Debug().Msgf("using config: %+v", cfg)
 	return otlh.NewClientBuilder().
 		WithDomain(cfg.Domain).
 		WithPort(cfg.Port).
 		WithTenant(cfg.Tenant).
 		WithAuthToken(cfg.AuthToken).
 		Build()
-
 }
 
 func importLegalholds(ctx *cli.Context) error {
