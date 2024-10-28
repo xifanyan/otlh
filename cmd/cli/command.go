@@ -62,6 +62,7 @@ var (
 		Subcommands: []*cli.Command{
 			ImportLegalholdsCmd,
 			ImportSilentholdsCmd,
+			ImportCustodiansCmd,
 		},
 	}
 
@@ -97,6 +98,16 @@ var (
 		},
 		Before: func(c *cli.Context) error {
 			return checkTimezone(c.String("timezone"))
+		},
+	}
+
+	ImportCustodiansCmd = &cli.Command{
+		Name:     "custodians",
+		Category: "import",
+		Action:   execute,
+		Flags: []cli.Flag{
+			CSV,
+			JSON,
 		},
 	}
 

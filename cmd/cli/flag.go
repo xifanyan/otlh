@@ -9,6 +9,11 @@ var (
 		Usage:   "excel file used for legalhold import",
 	}
 
+	JSON = &cli.StringFlag{
+		Name:  "json",
+		Usage: "path for json input",
+	}
+
 	CSV = &cli.StringFlag{
 		Name:  "csv",
 		Usage: "path for csv input",
