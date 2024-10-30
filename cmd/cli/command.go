@@ -106,8 +106,7 @@ var (
 		Category: "import",
 		Action:   execute,
 		Flags: []cli.Flag{
-			CSV,
-			JSON,
+			Input,
 		},
 	}
 
@@ -243,6 +242,8 @@ func execute(ctx *cli.Context) error {
 			return importLegalholds(ctx)
 		case "silentholds":
 			return importSilentholds(ctx)
+		case "custodians":
+			return importCustodians(ctx)
 		}
 	case "get":
 		switch ctx.Command.Name {
@@ -298,6 +299,28 @@ func NewClient(ctx *cli.Context) *otlh.Client {
 		WithTenant(cfg.Tenant).
 		WithAuthToken(cfg.AuthToken).
 		Build()
+}
+
+func importCustodians(ctx *cli.Context) error {
+	client := NewClient(ctx)
+
+	imp, err := importer.NewCustodianImporterBuilder().
+		WithInput(ctx.String("input")).
+		WithClient(client).
+		Build()
+
+	if err != nil {
+		return err
+	}
+
+	log.Debug().Msgf("data loaded")
+
+	if err = imp.Import(); err != nil {
+		return err
+	}
+
+	return nil
+
 }
 
 func importLegalholds(ctx *cli.Context) error {

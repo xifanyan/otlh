@@ -6,12 +6,13 @@ import (
 	"strings"
 
 	"github.com/gocarina/gocsv"
+	"github.com/rs/zerolog/log"
 	otlh "github.com/xifanyan/otlh/pkg"
 )
 
 type CustodianImporter struct {
 	input      string
-	custodians []otlh.Custodian
+	custodians []otlh.CustodianInputData
 	client     *otlh.Client
 }
 
@@ -30,23 +31,18 @@ func (b *CustodianImporterBuilder) WithClient(client *otlh.Client) *CustodianImp
 	return b
 }
 
-func (b *CustodianImporterBuilder) WithCSV(csv string) *CustodianImporterBuilder {
-	b.input = csv
+func (b *CustodianImporterBuilder) WithInput(name string) *CustodianImporterBuilder {
+	b.input = name
 	return b
 }
 
-func (b *CustodianImporterBuilder) WithJSON(json string) *CustodianImporterBuilder {
-	b.input = json
-	return b
-}
-
-func parseCustodianJson(input string) ([]otlh.Custodian, error) {
+func parseCustodianJson(input string) ([]otlh.CustodianInputData, error) {
 	data, err := os.ReadFile(input)
 	if err != nil {
 		return nil, err
 	}
 
-	var custodians []otlh.Custodian
+	var custodians []otlh.CustodianInputData
 
 	err = json.Unmarshal(data, &custodians)
 	if err != nil {
@@ -55,19 +51,19 @@ func parseCustodianJson(input string) ([]otlh.Custodian, error) {
 	return custodians, nil
 }
 
-func parseCustodianCsv(input string) ([]otlh.Custodian, error) {
+func parseCustodianCsv(input string) ([]otlh.CustodianInputData, error) {
 	data, err := os.ReadFile(input)
 	if err != nil {
 		return nil, err
 	}
 
-	var custodians []otlh.Custodian
+	var custodians []otlh.CustodianInputData
 
 	err = gocsv.UnmarshalBytes(data, &custodians)
 	if err != nil {
 		return nil, err
 	}
-	return nil, nil
+	return custodians, nil
 }
 
 func (b *CustodianImporterBuilder) Build() (*CustodianImporter, error) {
@@ -84,5 +80,10 @@ func (b *CustodianImporterBuilder) Build() (*CustodianImporter, error) {
 		return nil, err
 	}
 
+	log.Debug().Msgf("custodians %+v:", b.custodians)
 	return b.CustodianImporter, nil
+}
+
+func (c *CustodianImporter) Import() error {
+	return c.client.ImportCustodians(c.custodians)
 }

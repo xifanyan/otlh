@@ -309,6 +309,40 @@ func (c *Client) GetAllSilentholds(req Requestor, opts Options) (Silentholds, er
 	return getAllEntities(c, req, opts, unmarshalSilentholds)
 }
 
+func (c *Client) ImportCustodians(custodians []CustodianInputData) error {
+	var chunkSize = 1
+
+	req := NewRequest().WithTenant(c.tenant).Post().CustodiansSync().Build()
+
+	for i := 0; i < len(custodians); i += chunkSize {
+		end := i + chunkSize
+		if end > len(custodians) {
+			end = len(custodians)
+		}
+
+		body := CustodianSyncBody{
+			Custodians: custodians[i:end],
+		}
+
+		log.Debug().Msgf("%+v", body)
+
+		custodianBody, err := json.Marshal(body)
+		if err != nil {
+			return err
+		}
+
+		opts := NewBodyOptions().WithBody(string(custodianBody))
+		var resp CustodiansSyncResponse
+		if err := c.Do(req, &resp, opts); err != nil {
+			return err
+		}
+
+		log.Debug().Msgf("%+v", resp)
+	}
+
+	return nil
+}
+
 /**
  * ImportLegalhold imports a legal hold from a ZIP file.
  *
