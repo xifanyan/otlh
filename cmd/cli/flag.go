@@ -9,6 +9,17 @@ var (
 		Usage:   "excel file used for legalhold import",
 	}
 
+	Input = &cli.StringFlag{
+		Name:    "input",
+		Aliases: []string{"i"},
+		Usage:   "input file used for custodian import, either json or csv",
+	}
+
+	JSON = &cli.StringFlag{
+		Name:  "json",
+		Usage: "path for json input",
+	}
+
 	CSV = &cli.StringFlag{
 		Name:  "csv",
 		Usage: "path for csv input",
@@ -132,6 +143,13 @@ var (
 		Aliases: []string{"z"},
 		Usage:   "zip package for importing holds e.g., legal_hold_details.zip",
 		Value:   "",
+	}
+
+	BatchSize = &cli.IntFlag{
+		Name:    "batchSize",
+		Aliases: []string{"bs"},
+		Usage:   "batch size",
+		Value:   50,
 	}
 )
 

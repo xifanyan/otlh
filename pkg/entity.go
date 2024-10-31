@@ -24,6 +24,7 @@ func getAllEntities[T any](c *Client, req Requestor, opts Options, unmarshal fun
 	var page int = 1
 
 	bar := progressbar.Default(100)
+	defer bar.Finish()
 
 	for {
 		opts.(*ListOptions).WithPageNumber(page)

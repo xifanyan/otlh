@@ -45,6 +45,9 @@ func (req *Request) Custodian() *CustodianRequestBuilder {
 	return &CustodianRequestBuilder{CustodianRequest: &CustodianRequest{Request: *req}}
 }
 
+func (req *Request) CustodiansSync() *CustodiansSyncRequestBuilder {
+	return &CustodiansSyncRequestBuilder{CustodiansSyncRequest: &CustodiansSyncRequest{Request: *req}}
+}
 func (req *Request) CustodianGroup() *CustodianGroupRequestBuilder {
 	return &CustodianGroupRequestBuilder{CustodianGroupRequest: &CustodianGroupRequest{Request: *req}}
 }

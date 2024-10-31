@@ -62,6 +62,7 @@ var (
 		Subcommands: []*cli.Command{
 			ImportLegalholdsCmd,
 			ImportSilentholdsCmd,
+			ImportCustodiansCmd,
 		},
 	}
 
@@ -97,6 +98,16 @@ var (
 		},
 		Before: func(c *cli.Context) error {
 			return checkTimezone(c.String("timezone"))
+		},
+	}
+
+	ImportCustodiansCmd = &cli.Command{
+		Name:     "custodians",
+		Category: "import",
+		Action:   execute,
+		Flags: []cli.Flag{
+			Input,
+			BatchSize,
 		},
 	}
 
@@ -232,6 +243,8 @@ func execute(ctx *cli.Context) error {
 			return importLegalholds(ctx)
 		case "silentholds":
 			return importSilentholds(ctx)
+		case "custodians":
+			return importCustodians(ctx)
 		}
 	case "get":
 		switch ctx.Command.Name {
@@ -287,6 +300,29 @@ func NewClient(ctx *cli.Context) *otlh.Client {
 		WithTenant(cfg.Tenant).
 		WithAuthToken(cfg.AuthToken).
 		Build()
+}
+
+func importCustodians(ctx *cli.Context) error {
+	client := NewClient(ctx)
+
+	imp, err := importer.NewCustodianImporterBuilder().
+		WithInput(ctx.String("input")).
+		WithBatchSize(ctx.Int("batchSize")).
+		WithClient(client).
+		Build()
+
+	if err != nil {
+		return err
+	}
+
+	log.Debug().Msgf("data loaded")
+
+	if err = imp.Import(); err != nil {
+		return err
+	}
+
+	return nil
+
 }
 
 func importLegalholds(ctx *cli.Context) error {
