@@ -144,6 +144,13 @@ var (
 		Usage:   "zip package for importing holds e.g., legal_hold_details.zip",
 		Value:   "",
 	}
+
+	BatchSize = &cli.IntFlag{
+		Name:    "batchSize",
+		Aliases: []string{"bs"},
+		Usage:   "batch size",
+		Value:   50,
+	}
 )
 
 var DefaultListOptions = []cli.Flag{

@@ -107,6 +107,7 @@ var (
 		Action:   execute,
 		Flags: []cli.Flag{
 			Input,
+			BatchSize,
 		},
 	}
 
@@ -306,6 +307,7 @@ func importCustodians(ctx *cli.Context) error {
 
 	imp, err := importer.NewCustodianImporterBuilder().
 		WithInput(ctx.String("input")).
+		WithBatchSize(ctx.Int("batchSize")).
 		WithClient(client).
 		Build()
 

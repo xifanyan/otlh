@@ -4,10 +4,12 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/schollz/progressbar/v3"
 )
 
 const (
@@ -309,22 +311,23 @@ func (c *Client) GetAllSilentholds(req Requestor, opts Options) (Silentholds, er
 	return getAllEntities(c, req, opts, unmarshalSilentholds)
 }
 
-func (c *Client) ImportCustodians(custodians []CustodianInputData) error {
-	var chunkSize = 1
+func (c *Client) ImportCustodians(custodians []CustodianInputData, batchSize int) error {
+	bar := progressbar.Default(int64(len(custodians)))
+	defer bar.Finish()
 
 	req := NewRequest().WithTenant(c.tenant).Post().CustodiansSync().Build()
 
-	for i := 0; i < len(custodians); i += chunkSize {
-		end := i + chunkSize
+	for i := 0; i < len(custodians); i += batchSize {
+		end := i + batchSize
 		if end > len(custodians) {
 			end = len(custodians)
 		}
 
+		log.Debug().Msgf("Batch: %d - %d", i, end)
+
 		body := CustodianSyncBody{
 			Custodians: custodians[i:end],
 		}
-
-		log.Debug().Msgf("%+v", body)
 
 		custodianBody, err := json.Marshal(body)
 		if err != nil {
@@ -337,7 +340,8 @@ func (c *Client) ImportCustodians(custodians []CustodianInputData) error {
 			return err
 		}
 
-		log.Debug().Msgf("%+v", resp)
+		bar.Add(batchSize)
+		time.Sleep(5 * time.Millisecond)
 	}
 
 	return nil

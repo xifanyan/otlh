@@ -12,6 +12,7 @@ import (
 
 type CustodianImporter struct {
 	input      string
+	batchSize  int
 	custodians []otlh.CustodianInputData
 	client     *otlh.Client
 }
@@ -33,6 +34,11 @@ func (b *CustodianImporterBuilder) WithClient(client *otlh.Client) *CustodianImp
 
 func (b *CustodianImporterBuilder) WithInput(name string) *CustodianImporterBuilder {
 	b.input = name
+	return b
+}
+
+func (b *CustodianImporterBuilder) WithBatchSize(size int) *CustodianImporterBuilder {
+	b.batchSize = size
 	return b
 }
 
@@ -85,5 +91,5 @@ func (b *CustodianImporterBuilder) Build() (*CustodianImporter, error) {
 }
 
 func (c *CustodianImporter) Import() error {
-	return c.client.ImportCustodians(c.custodians)
+	return c.client.ImportCustodians(c.custodians, c.batchSize)
 }
