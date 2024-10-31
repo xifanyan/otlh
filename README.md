@@ -170,6 +170,7 @@ OPTIONS:
 - Attachment files should be put under attachment directory, it currently does not support subfolders, so please make attachment file names unique.
 
 ### Import Custodians
+```
 NAME:
    otlh import custodians
 
@@ -183,6 +184,7 @@ OPTIONS:
    --input value, -i value        input file used for custodian import, either json or csv
    --batchSize value, --bs value  batch size (default: 50)
    --help, -h                     show help
+```
 
 #### Example
 - Import custodians from json file
