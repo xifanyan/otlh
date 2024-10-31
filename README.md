@@ -181,7 +181,7 @@ CATEGORY:
    import
 
 OPTIONS:
-   --input value, -i value        input file used for custodian import, either json or csv
+   --input value, -i value        input file used for custodian import, e.g., custodians.json or custodians.csv
    --batchSize value, --bs value  batch size (default: 50)
    --help, -h                     show help
 ```
