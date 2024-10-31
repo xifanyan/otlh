@@ -168,3 +168,45 @@ OPTIONS:
 #### Notes
 - all datetime fields in excel need to follow pattern "1/2/06 3:04 PM", UTC is the default timezone, if you want to change it, please use --timezone option.
 - Attachment files should be put under attachment directory, it currently does not support subfolders, so please make attachment file names unique.
+
+### Import Custodians
+NAME:
+   otlh import custodians
+
+USAGE:
+   otlh import custodians [command options] [arguments...]
+
+CATEGORY:
+   import
+
+OPTIONS:
+   --input value, -i value        input file used for custodian import, either json or csv
+   --batchSize value, --bs value  batch size (default: 50)
+   --help, -h                     show help
+
+#### Example
+- Import custodians from json file
+```
+./otlh.exe --debug import custodians --input testdata/custodians.json --batchSize 100
+```
+
+- custodians.json
+```
+[
+    {
+        "name": "test01_pyan",
+        "email": "test01_pyan@opentext.com",
+        "phone": "555-555-1111"
+    },
+    {
+        "name": "test02_pyan",
+        "email": "test02_pyan@opentext.com",
+        "phone": "555-555-2222"
+    },
+    {
+        "name": "test03_pyan",
+        "email": "test03_pyan@opentext.com",
+        "phone": "555-555-3333"
+    }
+]
+```
