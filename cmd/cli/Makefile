@@ -1,9 +1,9 @@
 NAME=otlh
 
 build:
-	GOOS=windows GOARCH=amd64 go build -o bin/${NAME}-win64.exe .
-	GOOS=linux GOARCH=amd64 go build -o bin/${NAME}-linux-amd64 .
-	GOOS=darwin GOARCH=arm64 go build -o bin/${NAME}-darwin-arm64 .
+	GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o bin/${NAME}-win64.exe .
+	GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o bin/${NAME}-linux-amd64 .
+	GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o bin/${NAME}-darwin-arm64 .
 
 run:
 	go run .
