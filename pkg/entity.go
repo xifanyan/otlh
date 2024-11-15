@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"github.com/schollz/progressbar/v3"
 )
 
@@ -22,6 +23,8 @@ type DefaultEntityListInfo struct {
 func getAllEntities[T any](c *Client, req Requestor, opts Options, unmarshal func([]byte) ([]T, bool, int, error)) ([]T, error) {
 	var entities []T
 	var page int = 1
+
+	log.Debug().Msg("Getting all entities")
 
 	bar := progressbar.Default(100)
 	defer bar.Finish()
@@ -94,4 +97,10 @@ func unmarshalSilentholds(data []byte) ([]Silenthold, bool, int, error) {
 	var resp SilentholdsResponse
 	err := json.Unmarshal(data, &resp)
 	return resp.Embedded.Silentholds, resp.Page.HasMore, resp.Page.TotalCount, err
+}
+
+func unmarshalQuestionnaires(data []byte) ([]Questionnaire, bool, int, error) {
+	var resp QuestionnairesResponse
+	err := json.Unmarshal(data, &resp)
+	return resp.Embedded.Questionnaires, resp.Page.HasMore, resp.Page.TotalCount, err
 }

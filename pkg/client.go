@@ -311,6 +311,21 @@ func (c *Client) GetAllSilentholds(req Requestor, opts Options) (Silentholds, er
 	return getAllEntities(c, req, opts, unmarshalSilentholds)
 }
 
+func (c *Client) GetQuestionnaire(req Requestor) (Questionnaire, error) {
+	var questionnaire Questionnaire
+	return questionnaire, c.Do(req, &questionnaire)
+}
+
+func (c *Client) GetQuestionnaires(req Requestor, opts ...Options) (Questionnaires, error) {
+	var resp QuestionnairesResponse
+	err := c.Do(req, &resp, opts...)
+	return resp.Embedded.Questionnaires, err
+}
+
+func (c *Client) GetAllQuestionnaires(req Requestor, opts Options) (Questionnaires, error) {
+	return getAllEntities(c, req, opts, unmarshalQuestionnaires)
+}
+
 func (c *Client) ImportCustodians(custodians []CustodianInputData, batchSize int) error {
 	bar := progressbar.Default(int64(len(custodians)))
 	defer bar.Finish()

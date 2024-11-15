@@ -54,6 +54,7 @@ var (
 			GetMattersCmd,
 			GetLegalholdsCmd,
 			GetSilentholdsCmd,
+			GetQuestionnairesCmd,
 		},
 	}
 
@@ -186,6 +187,13 @@ var (
 		Flags:    DefaultListOptions,
 	}
 
+	GetQuestionnairesCmd = &cli.Command{
+		Name:     "questionnaires",
+		Category: "get",
+		Action:   execute,
+		Flags:    DefaultListOptions,
+	}
+
 	CreateFolderCmd = &cli.Command{
 		Name:     "folder",
 		Category: "create",
@@ -262,6 +270,8 @@ func execute(ctx *cli.Context) error {
 			return getSilentholds(ctx)
 		case "groups":
 			return getGroups(ctx)
+		case "questionnaires":
+			return getQuestionnaires(ctx)
 		}
 	case "verify":
 		switch ctx.Command.Name {
@@ -660,6 +670,37 @@ func getSilentholds(ctx *cli.Context) error {
 			v, err = client.GetAllSilentholds(req, opts)
 		} else {
 			v, err = client.GetSilentholds(req, opts)
+		}
+	}
+
+	if err != nil {
+		return err
+	}
+
+	printer := otlh.NewPrinter().JSON().Build()
+	printer.Print(v)
+	return nil
+}
+
+func getQuestionnaires(ctx *cli.Context) error {
+	var err error
+	var v any
+
+	var req otlh.Requestor
+
+	client := NewClient(ctx)
+	opts := listOptions(ctx)
+
+	b := otlh.NewRequest().WithTenant(client.Tenant()).Get().Questionnaire()
+	if ctx.Int("id") > 0 {
+		req, _ = b.WithID(ctx.Int("id")).Build()
+		v, err = client.GetQuestionnaire(req)
+	} else {
+		req, _ = b.Build()
+		if ctx.Bool("all") {
+			v, err = client.GetAllQuestionnaires(req, opts)
+		} else {
+			v, err = client.GetQuestionnaires(req, opts)
 		}
 	}
 

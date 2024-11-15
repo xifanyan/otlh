@@ -70,3 +70,7 @@ func (req *Request) Group() *GroupRequestBuilder {
 func (req *Request) Matter() *MatterRequestBuilder {
 	return &MatterRequestBuilder{MatterRequest: &MatterRequest{Request: *req}}
 }
+
+func (req *Request) Questionnaire() *QuestionnaireRequestBuilder {
+	return &QuestionnaireRequestBuilder{QuestionnaireRequest: &QuestionnaireRequest{Request: *req}}
+}
