@@ -105,12 +105,7 @@ func NewCreateMatterBody() *CreateMatterBody {
 		MatterContactsAttributes: []struct {
 			Name  string `json:"name"`
 			Email string `json:"email"`
-		}{
-			{
-				Name:  "admin",
-				Email: "",
-			},
-		},
+		}{},
 	}
 }
 
