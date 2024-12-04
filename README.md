@@ -36,7 +36,7 @@ USAGE:
    otlh [global options] command [command options]
 
 VERSION:
-   0.5.0-beta
+   0.5.2-beta
 
 COMMANDS:
    create
@@ -189,7 +189,7 @@ OPTIONS:
 #### Example
 - Import custodians from json file
 ```
-./otlh.exe --debug import custodians --input testdata/custodians.json --batchSize 100
+./otlh.exe --debug --config otlh_conf.json import custodians --input testdata/custodians.json --batchSize 100
 ```
 
 - custodians.json
