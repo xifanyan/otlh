@@ -67,6 +67,7 @@ GLOBAL OPTIONS:
 {
     "domain": "api.otlegalhold.com",
     "port": 443,
+    "httpProxy": "",
     "tenant": "demo",
     "authToken": "*************************"
 }
