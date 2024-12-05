@@ -36,7 +36,7 @@ USAGE:
    otlh [global options] command [command options]
 
 VERSION:
-   0.5.2-beta
+   0.5.3-beta
 
 COMMANDS:
    create
