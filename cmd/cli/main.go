@@ -31,6 +31,13 @@ func main() {
 				Value:   otlh.DEFAULT_PORT,
 			},
 			&cli.StringFlag{
+				Name:    "proxy",
+				Aliases: []string{"y"},
+				Usage:   "http proxy",
+				EnvVars: []string{"LHN_HTTPPROXY"},
+				Value:   "",
+			},
+			&cli.StringFlag{
 				Name:    "tenant",
 				Aliases: []string{"t"},
 				Usage:   "tenant name",

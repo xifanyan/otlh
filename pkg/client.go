@@ -43,6 +43,8 @@ type Client struct {
 	// port is the port to connect to.
 	port int
 
+	httpProxy string
+
 	// tenant name
 	tenant string
 
@@ -58,6 +60,7 @@ func NewClientBuilder() *ClientBuilder {
 		skipVerify: false,
 		domain:     "localhost",
 		port:       DEFAULT_PORT,
+		httpProxy:  "",
 		authToken:  "",
 	}}
 }
@@ -79,6 +82,11 @@ func (b *ClientBuilder) WithTenant(tenant string) *ClientBuilder {
 
 func (b *ClientBuilder) WithAuthToken(authToken string) *ClientBuilder {
 	b.authToken = authToken
+	return b
+}
+
+func (b *ClientBuilder) WithHttpProxy(proxy string) *ClientBuilder {
+	b.httpProxy = proxy
 	return b
 }
 
@@ -108,6 +116,10 @@ func (b *ClientBuilder) Build() *Client {
 			"X-AUTH-TOKEN": b.authToken,
 			"Content-Type": "application/json",
 		})
+
+	if b.httpProxy != "" {
+		r.SetProxy(b.httpProxy)
+	}
 
 	if zerolog.GlobalLevel() == zerolog.TraceLevel {
 		r.SetDebug(true)

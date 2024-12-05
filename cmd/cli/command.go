@@ -16,6 +16,7 @@ import (
 type ClientConfig struct {
 	Domain    string `json:"domain"`
 	Port      int    `json:"port"`
+	HttpProxy string `json:"httpProxy"`
 	Tenant    string `json:"tenant"`
 	AuthToken string `json:"authToken"`
 }
@@ -298,6 +299,7 @@ func NewClient(ctx *cli.Context) *otlh.Client {
 		cfg = &ClientConfig{
 			Domain:    ctx.String("domain"),
 			Port:      ctx.Int("port"),
+			HttpProxy: ctx.String("httpProxy"),
 			Tenant:    ctx.String("tenant"),
 			AuthToken: ctx.String("authToken"),
 		}
@@ -307,6 +309,7 @@ func NewClient(ctx *cli.Context) *otlh.Client {
 	return otlh.NewClientBuilder().
 		WithDomain(cfg.Domain).
 		WithPort(cfg.Port).
+		WithHttpProxy(cfg.HttpProxy).
 		WithTenant(cfg.Tenant).
 		WithAuthToken(cfg.AuthToken).
 		Build()
