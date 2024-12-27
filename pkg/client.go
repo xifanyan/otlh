@@ -374,6 +374,30 @@ func (c *Client) ImportCustodians(custodians []CustodianInputData, batchSize int
 	return nil
 }
 
+func (c *Client) ImportMatter(matter ImportMatterBody) (Matter, error) {
+	var respBody []byte
+	var resp Matter
+
+	req, _ := NewRequest().WithTenant(c.tenant).Patch().Matter().WithID(matter.ID).Build()
+
+	matterBody, err := json.Marshal(matter)
+	if err != nil {
+		return resp, err
+	}
+
+	opts := NewBodyOptions().WithBody(string(matterBody))
+
+	if respBody, err = c.Send(req, opts); err != nil {
+		return resp, err
+	}
+
+	if err = json.Unmarshal(respBody, &resp); err != nil {
+		return resp, err
+	}
+
+	return resp, nil
+}
+
 /**
  * ImportLegalhold imports a legal hold from a ZIP file.
  *
@@ -531,13 +555,6 @@ func (c *Client) FindOrCreateFolder(name string) (Folder, error) {
 	return c.CreateFolder(name, []int{group.ID})
 }
 
-/**
- * FindOrCreateMatter attempts to find a matter by the given name, and if not found, creates a new matter with the given name and folder ID.
- *
- * @param name - The name of the matter to find or create.
- * @param folderID - The ID of the folder to associate the new matter with.
- * @returns The found or created matter, and any error that occurred.
- */
 func (c *Client) FindMatterByName(name string) (Matter, error) {
 	var err error
 	var matters Matters = Matters{}

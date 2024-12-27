@@ -55,10 +55,10 @@ type LegalholdsResponse struct {
 	} `json:"_embedded"`
 }
 
-type HoldAction int
+type Action int
 
 const (
-	IMPORT HoldAction = iota + 1
+	IMPORT Action = iota + 1
 	SEND_NOTICE
 )
 
@@ -69,7 +69,7 @@ type LegalholdRequestBuilder struct {
 type LegalholdRequest struct {
 	id          int
 	custodianID int
-	action      HoldAction
+	action      Action
 	Request
 }
 

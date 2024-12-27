@@ -68,7 +68,7 @@ type SilentholdRequestBuilder struct {
 
 type SilentholdRequest struct {
 	id     int
-	action HoldAction
+	action Action
 	Request
 }
 

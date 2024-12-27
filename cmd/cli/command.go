@@ -65,6 +65,7 @@ var (
 			ImportLegalholdsCmd,
 			ImportSilentholdsCmd,
 			ImportCustodiansCmd,
+			ImportMattersCmd,
 		},
 	}
 
@@ -110,6 +111,15 @@ var (
 		Flags: []cli.Flag{
 			Input,
 			BatchSize,
+		},
+	}
+
+	ImportMattersCmd = &cli.Command{
+		Name:     "matters",
+		Category: "import",
+		Action:   execute,
+		Flags: []cli.Flag{
+			Excel,
 		},
 	}
 
@@ -254,6 +264,8 @@ func execute(ctx *cli.Context) error {
 			return importSilentholds(ctx)
 		case "custodians":
 			return importCustodians(ctx)
+		case "matters":
+			return ImportMatters(ctx)
 		}
 	case "get":
 		switch ctx.Command.Name {
@@ -427,6 +439,21 @@ func importSilentholds(ctx *cli.Context) error {
 
 	err = imp.Import()
 	return err
+}
+
+func ImportMatters(ctx *cli.Context) error {
+	var err error
+
+	imp := importer.NewMatterImporterBuilder().
+		WithClient(NewClient(ctx)).
+		WithExcel(ctx.String("excel")).
+		Build()
+
+	if err = imp.Import(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func listOptions(ctx *cli.Context) *otlh.ListOptions {

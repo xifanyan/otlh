@@ -41,6 +41,11 @@ func (req *Request) Post() *Request {
 	return req
 }
 
+func (req *Request) Patch() *Request {
+	req.method = PATCH
+	return req
+}
+
 func (req *Request) Custodian() *CustodianRequestBuilder {
 	return &CustodianRequestBuilder{CustodianRequest: &CustodianRequest{Request: *req}}
 }
