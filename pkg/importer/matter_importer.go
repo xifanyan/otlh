@@ -128,6 +128,10 @@ func (imptr *MatterImporter) Import() error {
 		return err
 	}
 
+	if err = imptr.checkDataIntegrity(); err != nil {
+		return err
+	}
+
 	for _, entry := range imptr.entries {
 		log.Debug().Msgf("Matter Input: %+v", entry)
 
@@ -136,6 +140,19 @@ func (imptr *MatterImporter) Import() error {
 			return err
 		}
 		log.Debug().Msgf("Matter Output: %+v", matter)
+	}
+
+	return nil
+}
+
+func (imptr *MatterImporter) checkDataIntegrity() error {
+	var uniqueNames map[string]struct{} = make(map[string]struct{})
+
+	for _, entry := range imptr.entries {
+		if _, ok := uniqueNames[entry.Name]; ok {
+			return fmt.Errorf("duplicate name: %s", entry.Name)
+		}
+		uniqueNames[entry.Name] = struct{}{}
 	}
 
 	return nil
