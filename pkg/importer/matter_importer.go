@@ -2,6 +2,7 @@ package importer
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/rs/zerolog/log"
@@ -9,7 +10,7 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-var MatterTemplateHeader = []string{"Matter Name", "Matter Number", "Case Number", "PO Number", "Caption", "Region", "Business Unit", "Notes", "Inherit Email Config", "Email From", "Email Reply-To", "Name On Outgoing Emails"}
+var MatterTemplateHeader = []string{"Matter Name", "Matter Number", "Case Number", "PO Number", "Caption", "Region", "Business Unit", "Notes", "Inherit Email Config", "Email From", "Email Reply-To", "Name On Outgoing Emails", "Contacts"}
 
 type MatterImporter struct {
 	excel               string
@@ -98,20 +99,28 @@ func (imptr *MatterImporter) LoadMatterData() error {
 
 			log.Debug().Msgf("Find Matter: %+v", matter)
 
+			// parse contacts RFC 5322
+			contacts, err := parseContacts(data[12])
+			if err != nil {
+				log.Error().Msgf("Error parsing contacts: %s, skipping ...", err)
+				continue
+			}
+
 			entry := otlh.ImportMatterBody{
-				ID:                   matter.ID,
-				Name:                 data[0],
-				Number:               data[1],
-				CaseNumber:           data[2],
-				PoNumber:             data[3],
-				Caption:              data[4],
-				Region:               data[5],
-				BusinessUnit:         data[6],
-				Notes:                data[7],
-				InheritEmailConfig:   data[8] == "TRUE",
-				EmailFrom:            data[9],
-				EmailReplyTo:         data[10],
-				NameOnOutgoingEmails: data[11],
+				ID:                       matter.ID,
+				Name:                     data[0],
+				Number:                   data[1],
+				CaseNumber:               data[2],
+				PoNumber:                 data[3],
+				Caption:                  data[4],
+				Region:                   data[5],
+				BusinessUnit:             data[6],
+				Notes:                    data[7],
+				InheritEmailConfig:       data[8] == "TRUE",
+				EmailFrom:                data[9],
+				EmailReplyTo:             data[10],
+				NameOnOutgoingEmails:     data[11],
+				MatterContactsAttributes: contacts,
 			}
 
 			imptr.entries = append(imptr.entries, entry)
@@ -156,4 +165,42 @@ func (imptr *MatterImporter) checkDataIntegrity() error {
 	}
 
 	return nil
+}
+
+// parseContacts parses a string of contacts in the format "Name <email>" and returns a slice of Contact structs.
+//
+// Args:
+//   input (string): A comma-separated string of contacts, where each contact is in the format "Name <email>".
+//
+// Returns:
+//   ([]otlh.Contact, error): Returns a slice of Contact structs with parsed name and email fields.
+//   If the input string is not in the correct format, an error is returned.
+
+func parseContacts(input string) ([]otlh.Contact, error) {
+	var contacts []otlh.Contact
+
+	// Regular expression to match the RFC 5322 format
+	re := regexp.MustCompile(`([^<]+)<([^>]+)>`)
+
+	// Split the input string by commas
+	parts := strings.Split(input, ",")
+
+	for _, part := range parts {
+		// Trim any leading or trailing whitespace
+		part = strings.TrimSpace(part)
+
+		// Match the pattern
+		matches := re.FindStringSubmatch(part)
+		if len(matches) != 3 {
+			return nil, fmt.Errorf("invalid format: %s", part)
+		}
+
+		// Create a new Contact struct and append it to the slice
+		contacts = append(contacts, otlh.Contact{
+			Name:  strings.TrimSpace(matches[1]),
+			Email: strings.TrimSpace(matches[2]),
+		})
+	}
+
+	return contacts, nil
 }

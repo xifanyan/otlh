@@ -99,20 +99,26 @@ type CreateMatterBody struct {
 	} `json:"matter_contacts_attributes"`
 }
 
+type Contact struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
 type ImportMatterBody struct {
-	ID                   int
-	Name                 string `json:"name,omitempty"`
-	Number               string `json:"number,omitempty"`
-	Notes                string `json:"notes,omitempty"`
-	Caption              string `json:"caption,omitempty"`
-	PoNumber             string `json:"po_number,omitempty"`
-	CaseNumber           string `json:"case_number,omitempty"`
-	InheritEmailConfig   bool   `json:"inherit_email_config"`
-	EmailFrom            string `json:"email_from,omitempty"`
-	EmailReplyTo         string `json:"email_reply_to,omitempty"`
-	Region               string `json:"region,omitempty"`
-	BusinessUnit         string `json:"business_unit,omitempty"`
-	NameOnOutgoingEmails string `json:"name_on_outgoing_emails,omitempty"`
+	ID                       int
+	Name                     string    `json:"name,omitempty"`
+	Number                   string    `json:"number,omitempty"`
+	Notes                    string    `json:"notes,omitempty"`
+	Caption                  string    `json:"caption,omitempty"`
+	PoNumber                 string    `json:"po_number,omitempty"`
+	CaseNumber               string    `json:"case_number,omitempty"`
+	InheritEmailConfig       bool      `json:"inherit_email_config"`
+	EmailFrom                string    `json:"email_from,omitempty"`
+	EmailReplyTo             string    `json:"email_reply_to,omitempty"`
+	Region                   string    `json:"region,omitempty"`
+	BusinessUnit             string    `json:"business_unit,omitempty"`
+	NameOnOutgoingEmails     string    `json:"name_on_outgoing_emails,omitempty"`
+	MatterContactsAttributes []Contact `json:"matter_contacts_attributes"`
 }
 
 func NewCreateMatterBody() *CreateMatterBody {
