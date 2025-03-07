@@ -14,7 +14,7 @@ func main() {
 
 	app := &cli.App{
 		Name:    "otlh",
-		Version: "0.5.4-beta",
+		Version: "0.5.5-beta",
 		Usage:   "Command Line Interface to access Opentext LegalHold service",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
