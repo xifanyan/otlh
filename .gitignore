@@ -14,4 +14,4 @@ Desktop.ini
 Thumbs.db
 
 bin/
-testdata/
+# testdata/
