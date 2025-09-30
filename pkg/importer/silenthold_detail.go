@@ -32,9 +32,12 @@ func (shd SilentholdDetail) saveToExcel(dir string, tz string) error {
 	f := excelize.NewFile()
 	defer f.Close()
 
-	f.NewSheet(SHEET_NAME_HOLD_DETAILS)
-	f.SetSheetRow(SHEET_NAME_HOLD_DETAILS, "A1", &SilentholdDetailsHeader)
-	f.SetSheetRow(SHEET_NAME_HOLD_DETAILS, "A2",
+	if _, err = f.NewSheet(SHEET_NAME_HOLD_DETAILS); err != nil {
+		return err
+	}
+
+	_ = f.SetSheetRow(SHEET_NAME_HOLD_DETAILS, "A1", &SilentholdDetailsHeader)
+	_ = f.SetSheetRow(SHEET_NAME_HOLD_DETAILS, "A2",
 		&[]interface{}{
 			shd.SilentholdInfo.MatterID,
 			shd.SilentholdInfo.HoldName,
@@ -44,27 +47,26 @@ func (shd SilentholdDetail) saveToExcel(dir string, tz string) error {
 		},
 	)
 
-	f.NewSheet(SHEET_NAME_CUSTODIANS_DETAILS)
-	f.SetSheetRow(SHEET_NAME_CUSTODIANS_DETAILS, "A1", &SilentholdCustodianDetailsHeader)
+	if _, err = f.NewSheet(SHEET_NAME_CUSTODIANS_DETAILS); err != nil {
+		return err
+	}
+
+	_ = f.SetSheetRow(SHEET_NAME_CUSTODIANS_DETAILS, "A1", &SilentholdCustodianDetailsHeader)
 	for i, custodianDetail := range shd.CustodianDetails {
-		row := []interface{}{
+		row := []any{
 			custodianDetail.Name,
 			custodianDetail.Email,
+			convertDateTimeOrDefault(tz, custodianDetail.SentAt),
+			convertDateTimeOrDefault(tz, custodianDetail.ReleasedAt),
 		}
 
-		if sentAt, err := convertDateTimeFormat(tz, custodianDetail.SentAt); err == nil {
-			row = append(row, sentAt)
-		}
-
-		if releasedAt, err := convertDateTimeFormat(tz, custodianDetail.ReleasedAt); err == nil {
-			row = append(row, releasedAt)
-		}
-
-		f.SetSheetRow(SHEET_NAME_CUSTODIANS_DETAILS, fmt.Sprintf("A%d", i+2), &row)
+		_ = f.SetSheetRow(SHEET_NAME_CUSTODIANS_DETAILS, fmt.Sprintf("A%d", i+2), &row)
 	}
 
 	// delete detaful sheet "Sheet1"
-	f.DeleteSheet("Sheet1")
+	if err = f.DeleteSheet("Sheet1"); err != nil {
+		return err
+	}
 
 	if err = f.SaveAs(fmt.Sprintf("%s/silent_hold_details.xlsx", dir)); err != nil {
 		return err

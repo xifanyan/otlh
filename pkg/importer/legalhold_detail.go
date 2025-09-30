@@ -53,15 +53,31 @@ func convertDateTimeFormat(tz string, input string) (string, error) {
 	return output, nil
 }
 
+// convertDateTimeOrDefault converts datetime string to UTC format, returns nil on error
+func convertDateTimeOrDefault(tz string, input string) any {
+	if input == "" {
+		return nil
+	}
+
+	result, err := convertDateTimeFormat(tz, input)
+	if err != nil {
+		return nil
+	}
+	return result
+}
+
 func (lhd LegalholdDetail) saveToExcel(dir string, tz string) error {
 	var err error
 
 	f := excelize.NewFile()
 	defer f.Close()
 
-	f.NewSheet(SHEET_NAME_HOLD_DETAILS)
-	f.SetSheetRow(SHEET_NAME_HOLD_DETAILS, "A1", &LegalholdDetailsHeader)
-	f.SetSheetRow(SHEET_NAME_HOLD_DETAILS, "A2",
+	if _, err = f.NewSheet(SHEET_NAME_HOLD_DETAILS); err != nil {
+		return err
+	}
+
+	_ = f.SetSheetRow(SHEET_NAME_HOLD_DETAILS, "A1", &LegalholdDetailsHeader)
+	_ = f.SetSheetRow(SHEET_NAME_HOLD_DETAILS, "A2",
 		&[]interface{}{
 			lhd.LegalholdInfo.MatterID,
 			lhd.LegalholdInfo.HoldName,
@@ -72,31 +88,27 @@ func (lhd LegalholdDetail) saveToExcel(dir string, tz string) error {
 		},
 	)
 
-	f.NewSheet(SHEET_NAME_CUSTODIANS_DETAILS)
-	f.SetSheetRow(SHEET_NAME_CUSTODIANS_DETAILS, "A1", &LegalholdCustodianDetailsHeader)
+	if _, err = f.NewSheet(SHEET_NAME_CUSTODIANS_DETAILS); err != nil {
+		return err
+	}
+
+	_ = f.SetSheetRow(SHEET_NAME_CUSTODIANS_DETAILS, "A1", &LegalholdCustodianDetailsHeader)
 	for i, custodianDetail := range lhd.CustodianDetails {
-		row := []interface{}{
+		row := []any{
 			custodianDetail.Name,
 			custodianDetail.Email,
+			convertDateTimeOrDefault(tz, custodianDetail.SentAt),
+			convertDateTimeOrDefault(tz, custodianDetail.AcknowlegedAt),
+			convertDateTimeOrDefault(tz, custodianDetail.ReleasedAt),
 		}
 
-		if sentAt, err := convertDateTimeFormat(tz, custodianDetail.SentAt); err == nil {
-			row = append(row, sentAt)
-		}
-
-		if acknowlegedAt, err := convertDateTimeFormat(tz, custodianDetail.AcknowlegedAt); err == nil {
-			row = append(row, acknowlegedAt)
-		}
-
-		if releasedAt, err := convertDateTimeFormat(tz, custodianDetail.ReleasedAt); err == nil {
-			row = append(row, releasedAt)
-		}
-
-		f.SetSheetRow(SHEET_NAME_CUSTODIANS_DETAILS, fmt.Sprintf("A%d", i+2), &row)
+		_ = f.SetSheetRow(SHEET_NAME_CUSTODIANS_DETAILS, fmt.Sprintf("A%d", i+2), &row)
 	}
 
 	// delete detaful sheet "Sheet1"
-	f.DeleteSheet("Sheet1")
+	if err = f.DeleteSheet("Sheet1"); err != nil {
+		return err
+	}
 
 	if err = f.SaveAs(fmt.Sprintf("%s/legal_hold_details.xlsx", dir)); err != nil {
 		return err
